@@ -1,0 +1,2 @@
+defmodule SimpleTank do
+end
