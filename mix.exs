@@ -12,7 +12,10 @@ defmodule SimpleTank.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: []]
+    [ 
+      mod: { SimpleTank, []},
+      applications: []
+    ]
   end
 
   # Dependencies can be hex.pm packages:
