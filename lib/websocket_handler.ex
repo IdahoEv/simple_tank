@@ -15,7 +15,7 @@ defmodule WebsocketHandler do
     delta = %{ x: HashDict.get(json, "x"), y: HashDict.get(json, "y")}
     IO.puts inspect(delta)
     tank(state) |> SimpleTank.Tank.update_position(delta)
-    {:reply, {:text, "Position updated! "}, req, state}
+    {:ok, req, state}
   end
 
   def websocket_handle(_rata, req, state) do    
@@ -24,7 +24,8 @@ defmodule WebsocketHandler do
 
   def websocket_info({timeout, _ref, msg}, req, state) do
     position = SimpleTank.Tank.get_position(tank(state))
-    :erlang.start_timer(1000, self(), inspect(position) )
+    {:ok, json} = JSON.encode([ position: [x: position.x, y: position.y] ])
+    :erlang.start_timer(20, self(), json )
     {:reply, {:text, msg}, req, state}
   end
 

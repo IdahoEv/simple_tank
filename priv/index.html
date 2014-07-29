@@ -76,7 +76,14 @@
       };  
 
       function onMessage(evt) { 
+        console.log(evt.data);
+        message = JSON.parse(evt.data);
+        if ( message.position !== undefined) {
+          $('#position').html(Number(message.position.x.toFixed(2)) + ", " + Number(message.position.y.toFixed(2)))
+        }
+        else {
           showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
+        }
       };  
 
       function onError(evt) {
@@ -123,6 +130,7 @@
               <button type="button" onclick="sendLeft();">Left</button>
             </td>
             <td>
+               <div id="position"></div>       
             </td>
             <td>
               <button type="button" onclick="sendRight();">Right</button>
@@ -141,7 +149,7 @@
 
       </div>
 
-      <div id="content">						
+      <div id="content">
 	<div id="output"></div>
       </div>
 
