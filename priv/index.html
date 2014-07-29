@@ -1,0 +1,150 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Websocket client</title>
+    <script src="/static/jquery.min.js"></script>
+    <script type="text/javascript">
+      
+      var websocket;
+      $(document).ready(init);
+      
+      function init() {
+          $('#server').val("ws://" + window.location.host + "/websocket");
+          if(!("WebSocket" in window)){  
+              $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
+              $("#navigation").hide();  
+          } else {
+              $('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
+              connect();
+          };
+              $("#connected").hide(); 	
+              $("#content").hide(); 	
+      };
+
+      function connect()
+      {
+          wsHost = $("#server").val()
+          websocket = new WebSocket(wsHost);
+          showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
+          websocket.onopen = function(evt) { onOpen(evt) }; 
+          websocket.onclose = function(evt) { onClose(evt) }; 
+          websocket.onmessage = function(evt) { onMessage(evt) }; 
+          websocket.onerror = function(evt) { onError(evt) }; 
+      };  
+      
+      function disconnect() {
+          websocket.close();
+      }; 
+
+      function toggle_connection(){
+          if(websocket.readyState == websocket.OPEN){
+              disconnect();
+          } else {
+              connect();
+          };
+      };
+ 
+      function sendDir(message) {
+          if(websocket.readyState == websocket.OPEN){
+              websocket.send(JSON.stringify(message));
+              showScreen('sending: (' + message.x + ', ' + message.y + ')'); 
+          } else {
+               showScreen('websocket is not connected'); 
+          };
+      };
+      function sendUp() {
+        sendDir({ x: 0, y: -0.1})
+      };
+      function sendDown() {
+        sendDir({ x: 0, y: 0.1})
+      };
+      function sendLeft() {
+        sendDir({ x: -0.1, y: 0})
+      };
+      function sendRight() {
+        sendDir({ x: 0.1, y: 0})
+      };
+
+      function onOpen(evt) { 
+          showScreen('<span style="color: green;">CONNECTED </span>'); 
+          $("#connected").fadeIn('slow');
+          $("#content").fadeIn('slow');
+      };  
+
+      function onClose(evt) { 
+          showScreen('<span style="color: red;">DISCONNECTED </span>');
+      };  
+
+      function onMessage(evt) { 
+          showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
+      };  
+
+      function onError(evt) {
+          showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>');
+      };
+
+      function showScreen(txt) { 
+          $('#output').prepend('<p>' + txt + '</p>');
+      };
+
+      function clearScreen() 
+      { 
+          $('#output').html("");
+      };
+    </script>
+  </head>
+
+  <body>
+    <div id="header">
+      <h1>Websocket client</h1>
+      <div id="status"></div>
+    </div>
+
+
+    <div id="navigation">
+
+      <p id="connecting">
+	<input type='text' id="server" value=""></input>
+	<button type="button" onclick="toggle_connection()">connection</button>
+      </p>      
+      <div id="connected">				
+        <table>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <button type="button" onclick="sendUp();">Up</button>
+            </td>
+            <td>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button type="button" onclick="sendLeft();">Left</button>
+            </td>
+            <td>
+            </td>
+            <td>
+              <button type="button" onclick="sendRight();">Right</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <button type="button" onclick="sendDown();">Down</button>
+            </td>
+            <td>
+            </td>
+          </tr>
+        </table>
+
+      </div>
+
+      <div id="content">						
+	<div id="output"></div>
+      </div>
+
+    </div>
+  </body>
+</html> 

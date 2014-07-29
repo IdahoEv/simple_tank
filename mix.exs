@@ -28,6 +28,8 @@ defmodule SimpleTank.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [ { :cowboy, github: "extend/cowboy", tag: "0.10.0"  } ]
+    [ { :cowboy, github: "extend/cowboy", tag: "0.10.0"  },
+      { :json,   github: "cblage/elixir-json"} 
+    ]
   end
 end
