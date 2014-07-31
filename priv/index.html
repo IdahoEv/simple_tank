@@ -1,119 +1,39 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Websocket client</title>
+    <title>Tankity Tank</title>
+
+   <!-- module loader -->
+    <script type="text/javascript" src="http://code.famo.us/lib/require.js"></script>
+
+    <!-- famous -->
+    <link rel="stylesheet" type="text/css" href="http://code.famo.us/famous/0.2/famous.css" />
+    <script type="text/javascript" src="http://code.famo.us/famous/0.2/famous.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/static/application.css" />
     <script src="/static/jquery.min.js"></script>
-    <script type="text/javascript">
-      
-      var websocket;
-      $(document).ready(init);
-      
-      function init() {
-          $('#server').val("ws://" + window.location.host + "/websocket");
-          if(!("WebSocket" in window)){  
-              $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
-              $("#navigation").hide();  
-          } else {
-              $('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
-              connect();
-          };
-              $("#connected").hide(); 	
-              $("#content").hide(); 	
-      };
-
-      function connect()
-      {
-          wsHost = $("#server").val()
-          websocket = new WebSocket(wsHost);
-          showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
-          websocket.onopen = function(evt) { onOpen(evt) }; 
-          websocket.onclose = function(evt) { onClose(evt) }; 
-          websocket.onmessage = function(evt) { onMessage(evt) }; 
-          websocket.onerror = function(evt) { onError(evt) }; 
-      };  
-      
-      function disconnect() {
-          websocket.close();
-      }; 
-
-      function toggle_connection(){
-          if(websocket.readyState == websocket.OPEN){
-              disconnect();
-          } else {
-              connect();
-          };
-      };
- 
-      function sendDir(message) {
-          if(websocket.readyState == websocket.OPEN){
-              websocket.send(JSON.stringify(message));
-              showScreen('sending: (' + message.x + ', ' + message.y + ')'); 
-          } else {
-               showScreen('websocket is not connected'); 
-          };
-      };
-      function sendUp() {
-        sendDir({ x: 0, y: -0.1})
-      };
-      function sendDown() {
-        sendDir({ x: 0, y: 0.1})
-      };
-      function sendLeft() {
-        sendDir({ x: -0.1, y: 0})
-      };
-      function sendRight() {
-        sendDir({ x: 0.1, y: 0})
-      };
-
-      function onOpen(evt) { 
-          showScreen('<span style="color: green;">CONNECTED </span>'); 
-          $("#connected").fadeIn('slow');
-          $("#content").fadeIn('slow');
-      };  
-
-      function onClose(evt) { 
-          showScreen('<span style="color: red;">DISCONNECTED </span>');
-      };  
-
-      function onMessage(evt) { 
-        console.log(evt.data);
-        message = JSON.parse(evt.data);
-        if ( message.position !== undefined) {
-          $('#position').html(Number(message.position.x.toFixed(2)) + ", " + Number(message.position.y.toFixed(2)))
-        }
-        else {
-          showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
-        }
-      };  
-
-      function onError(evt) {
-          showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>');
-      };
-
-      function showScreen(txt) { 
-          $('#output').prepend('<p>' + txt + '</p>');
-      };
-
-      function clearScreen() 
-      { 
-          $('#output').html("");
-      };
-    </script>
+    <script src="/static/socket_handler.js"></script>
   </head>
 
   <body>
-    <div id="header">
-      <h1>Websocket client</h1>
-      <div id="status"></div>
-    </div>
-
-
-    <div id="navigation">
-
+    <div id="header" class='clearfix'>
+      <h1>Tankity Tank</h1>
+      <div id="status">
+        <div class='section'>
+          Socket Messages: <span id='message_count'></span>          
+        </div>
+        <div class='section'>
+          Frames: <span id='frame_count'></span>
+        </div>
+      </div>
       <p id="connecting">
 	<input type='text' id="server" value=""></input>
 	<button type="button" onclick="toggle_connection()">connection</button>
       </p>      
+    </div>
+
+    <div id="navigation">
+
       <div id="connected">				
         <table>
           <tr>
@@ -148,9 +68,15 @@
         </table>
 
       </div>
+     
 
-      <div id="content">
-	<div id="output"></div>
+      <div id='content'>
+        <div id="messages">
+          <h3>Socket Messages:</h3>
+          <div id="output"></div>
+        </div>
+        <div id='field'>
+        </div>
       </div>
 
     </div>
