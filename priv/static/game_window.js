@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define('game_window', function(require, exports, module) {
     var Engine  = require("famous/core/Engine");
     var Surface = require("famous/core/Surface");
     var StateModifier = require("famous/modifiers/StateModifier");
@@ -23,7 +23,7 @@ define(function(require, exports, module) {
       size: [16,16],
       properties: {
         backgroundColor: "#333333"
-      }  
+      }
     });
 
     var tankPosition = new StateModifier({
