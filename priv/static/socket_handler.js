@@ -71,18 +71,22 @@ function onClose(evt) {
 };  
 
 function onMessage(evt) { 
-  console.log(evt.data);
-  message = JSON.parse(evt.data);
-  if ( message.position !== undefined) {
-    $('#position').html(Number(message.position.x.toFixed(2)) +
-        ", " + 
-        Number(message.position.y.toFixed(2)));
-    messages++;
-    console.log(messages);
-    $('#message_count').html(messages);
-  }
-  else {
-    showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
+  //console.log(evt.data);
+  try {
+    message = JSON.parse(evt.data);
+    if ( message.position !== undefined) {
+      $('#position').html(Number(message.position.x.toFixed(2)) +
+          ", " + 
+          Number(message.position.y.toFixed(2)));
+      messages++;
+      //console.log(messages);
+      $('#message_count').html(messages);
+    }
+    else {
+      showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
+    }
+  } catch(err) {
+    console.log("Could not JSON parse event message: "+evt.data)
   }
 };  
 
