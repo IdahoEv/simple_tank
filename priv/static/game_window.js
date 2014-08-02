@@ -1,32 +1,54 @@
-define(function(require, exports, module) {
-    var Engine  = require("famous/core/Engine");
-    var Surface = require("famous/core/Surface");
-    var StateModifier = require("famous/modifiers/StateModifier");
-    var Transform = require("famous/core/Transform");
-    var mainContext = Engine.createContext(document.getElementById('field'));
+var GameWindow = (function () {
+	var my = {},
+		//privateVariable = 1,
+    canvas,
+    context,
+    width,
+    height,
+    scale = 16;   // pixels per unit size. Tank height/width is 1.0 unit size.
+  
+	//function privateMethod() {
+		//// ...
+	//}
 
-    var surface = new Surface({
-        size: [800, 600],
-        content: "This is the tank field",
-        classes: ["red-bg"],
-        properties: {
-            backgroundColor: "#99c999",
-            lineHeight: "200px",
-            textAlign: "center"
-        }
-    });
+	//my.moduleProperty = 1;
+	//my.moduleMethod = function () {
+		//// ...
+	//};
 
-    var tank = new Surface({
-      size: [16,16],
-      properties: {
-        backgroundColor: "#333333"
-      }  
-    });
 
-    var tankPosition = new StateModifier({
-      transform: Transform.translate(400,300,1)
-    });
+  function drawField() {
+    context.beginPath();
+    context.rect(width / -2, height / -2, width, height);
+    context.fillStyle = '#99CA99';
+    context.fill();
+  }
 
-    mainContext.add(surface);
-    mainContext.add(tankPosition).add(tank);
-});
+  function scaleCoords(coords){
+    return { 
+      x: (coords.x * scale),
+      y: (coords.y * scale)
+    }
+  }
+
+  my.init = function() {
+    canvas = document.getElementById('gameCanvas');
+    context = canvas.getContext('2d');
+    width = canvas.width;
+    height = canvas.height;
+    context.translate( (width / 2.0), (height / 2.0) );
+  }
+  
+  my.draw = function(tank){
+    drawField();
+    tankCoords = scaleCoords(tank);
+    context.beginPath();
+    context.rect(tankCoords.x - scale/2, tankCoords.y - scale/2, scale, scale);
+    context.fillStyle = 'black';
+    context.fill();
+  }
+
+	return my;
+}());
+
+

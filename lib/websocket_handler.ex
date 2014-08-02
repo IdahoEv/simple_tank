@@ -25,7 +25,7 @@ defmodule WebsocketHandler do
   def websocket_info({timeout, _ref, msg}, req, state) do
     position = SimpleTank.Tank.get_position(tank(state))
     {:ok, json} = JSON.encode([ position: [x: position.x, y: position.y] ])
-    :erlang.start_timer(20, self(), json )
+    :erlang.start_timer(50, self(), json )
     {:reply, {:text, msg}, req, state}
   end
 

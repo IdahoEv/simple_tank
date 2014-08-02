@@ -1,17 +1,18 @@
 body {
   font-family: sans-serif;
   font-size: 11px;
+  padding: 0;
+  margin: 0;
 }
 #messages {
   width: 200px;
   float: left;
-  height: 100%
-  font-size: 
+  height: 100%;
 }
 #field {
   margin-left: 200px;
   border-left: 1px black solid;
-  min-height: 1000px;iex -
+  min-height: 1000px;
 }
 #header h1 {
   float: left;
@@ -31,6 +32,11 @@ body {
 }
 #messages p {
   margin: 0.25em 1em;
+}
+
+#gameCanvas {
+  width: 600px;
+  height: 600px;
 }
 
 .clearfix:after {
