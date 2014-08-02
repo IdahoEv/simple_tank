@@ -70,17 +70,21 @@ function onClose(evt) {
   showScreen('<span style="color: red;">DISCONNECTED </span>');
 };  
 
+function updatePosition(position) {
+  $('#position').html(Number(message.position.x.toFixed(2)) +
+    ", " + 
+      Number(message.position.y.toFixed(2)));
+  messages++;
+  //console.log(messages);
+  $('#message_count').html(messages);
+}
+
 function onMessage(evt) { 
   //console.log(evt.data);
   try {
     message = JSON.parse(evt.data);
     if ( message.position !== undefined) {
-      $('#position').html(Number(message.position.x.toFixed(2)) +
-          ", " + 
-          Number(message.position.y.toFixed(2)));
-      messages++;
-      //console.log(messages);
-      $('#message_count').html(messages);
+      updatePosition(message.position);
     }
     else {
       showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
