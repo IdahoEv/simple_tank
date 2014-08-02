@@ -18,7 +18,21 @@ var SocketHandler = (function(){
     $("#connected").hide(); 	
     $("#messages").hide(); 	
   };
+  my.sendUp = function() {
+    sendDir({ x: 0, y: -1 * moveScale})
+  };
+  my.sendDown = function() {
+    sendDir({ x: 0, y: moveScale})
+  };
+  my.sendLeft = function() {
+    sendDir({ x: -1 * moveScale, y: 0})
+  };
+  my.sendRight = function() {
+    sendDir({ x: moveScale, y: 0})
+  };
 
+
+  // Private methods
   function connect() {
     wsHost = $("#server").val()
       websocket = new WebSocket(wsHost);
@@ -48,18 +62,6 @@ var SocketHandler = (function(){
     } else {
       showScreen('websocket is not connected'); 
     };
-  };
-  my.sendUp = function() {
-    sendDir({ x: 0, y: -1 * moveScale})
-  };
-  my.sendDown = function() {
-    sendDir({ x: 0, y: moveScale})
-  };
-  my.sendLeft = function() {
-    sendDir({ x: -1 * moveScale, y: 0})
-  };
-  my.sendRight = function() {
-    sendDir({ x: moveScale, y: 0})
   };
 
   function onOpen(evt) { 
