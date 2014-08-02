@@ -5,8 +5,11 @@ define(function(require, exports, module) {
     var Transform = require("famous/core/Transform");
     var mainContext = Engine.createContext(document.getElementById('field'));
 
+    var scale = 16;
+    var offset = 400;
+
     var surface = new Surface({
-        size: [800, 600],
+        size: [800, 800],
         content: "This is the tank field",
         classes: ["red-bg"],
         properties: {
@@ -24,9 +27,19 @@ define(function(require, exports, module) {
     });
 
     var tankPosition = new StateModifier({
-      transform: Transform.translate(400,300,1)
+      transform: Transform.translate(offset,offset,1)
     });
 
     mainContext.add(surface);
     mainContext.add(tankPosition).add(tank);
+
+    var updateTankPosition = function(position) {
+      tankPosition.setTransform(Transform.translate(
+            position.x * scale + offset,
+            position.y * scale + offset,
+            1
+      ));
+    }
+
+    module.exports = updateTankPosition;
 });

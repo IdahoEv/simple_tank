@@ -1,6 +1,9 @@
+define(function(require, exports, module){
+
 var websocket;
 var frames = 0;
 var messages = 0;
+var updateTankPosition = require('game_window');
 $(document).ready(init);
 
 function init() {
@@ -39,6 +42,8 @@ function toggle_connection(){
   };
 };
 
+var delta = 1.0;
+
 function sendDir(message) {
   if(websocket.readyState == websocket.OPEN){
     websocket.send(JSON.stringify(message));
@@ -48,16 +53,16 @@ function sendDir(message) {
         };
         };
         function sendUp() {
-          sendDir({ x: 0, y: -0.1})
+          sendDir({ x: 0, y: -1 * delta})
         };
         function sendDown() {
-          sendDir({ x: 0, y: 0.1})
+          sendDir({ x: 0, y: delta})
         };
         function sendLeft() {
-          sendDir({ x: -0.1, y: 0})
+          sendDir({ x: -1 * delta, y: 0})
         };
         function sendRight() {
-          sendDir({ x: 0.1, y: 0})
+          sendDir({ x: delta, y: 0})
         };
 
         function onOpen(evt) { 
@@ -74,7 +79,8 @@ function updatePosition(position) {
   $('#position').html(Number(message.position.x.toFixed(2)) +
     ", " + 
       Number(message.position.y.toFixed(2)));
-  messages++;
+  updateTankPosition(position);
+  messages++; 
   //console.log(messages);
   $('#message_count').html(messages);
 }
@@ -107,3 +113,4 @@ function clearScreen()
   $('#output').html("");
 };
 
+})
