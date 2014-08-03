@@ -34,6 +34,7 @@ var GameWindow = (function () {
   my.init = function() {
     canvas = document.getElementById('gameCanvas');
     context = canvas.getContext('2d');
+    my.canvas = canvas;
     width = canvas.width;
     height = canvas.height;
     context.translate( (width / 2.0), (height / 2.0) );
@@ -50,5 +51,3 @@ var GameWindow = (function () {
 
 	return my;
 }());
-
-

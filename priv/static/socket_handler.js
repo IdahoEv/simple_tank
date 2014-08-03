@@ -2,10 +2,9 @@ var SocketHandler = (function(){
   var my = {},
     websocket,
     messages = 0,
-    gameWindow,
     moveScale = 0.5;
 
-  my.init = function(gw) {
+  my.init = function() {
     $('#server').val("ws://" + window.location.host + "/websocket");
     if(!("WebSocket" in window)){  
       $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
@@ -13,7 +12,6 @@ var SocketHandler = (function(){
     } else {
       //$('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
       connect();
-      gameWindow = gw; 
     };
     $("#connected").hide(); 	
     $("#messages").hide(); 	
@@ -35,7 +33,7 @@ var SocketHandler = (function(){
   // Private methods
   function connect() {
     wsHost = $("#server").val()
-      websocket = new WebSocket(wsHost);
+    websocket = new WebSocket(wsHost);
     showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
     websocket.onopen = function(evt) { onOpen(evt) }; 
     websocket.onclose = function(evt) { onClose(evt) }; 
@@ -116,7 +114,3 @@ var SocketHandler = (function(){
   return my;
 }());
 
-$(document).ready(function(){
-  var gw = GameWindow.init();
-  SocketHandler.init(gw);
-});
