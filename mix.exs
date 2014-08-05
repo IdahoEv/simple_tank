@@ -4,7 +4,7 @@ defmodule SimpleTank.Mixfile do
   def project do
     [app: :simple_tank,
      version: "0.0.1",
-     elixir: "~> 0.14.2",
+     elixir: "~> 0.15.0",
      deps: deps]
   end
 
@@ -14,7 +14,7 @@ defmodule SimpleTank.Mixfile do
   def application do
     [ 
       mod: { SimpleTank, []},
-      applications: [ :cowboy, :ranch ]
+      applications: [ :cowboy, :ranch, :dbg ]
     ]
   end
 
@@ -29,7 +29,8 @@ defmodule SimpleTank.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [ { :cowboy, github: "extend/cowboy", tag: "0.10.0"  },
-      { :json,   github: "cblage/elixir-json"} 
+      { :jsex, "~> 2.0.0" } ,
+      { :dbg, "~> 0.14.3" }
     ]
   end
 end

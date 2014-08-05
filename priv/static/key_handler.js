@@ -5,20 +5,28 @@ var KeyHandler = (function(){
   my.init = function(){
     canvas = GameWindow.canvas;
     canvas.addEventListener('keydown', keydown);
-    canvas.addEventListener('keyup', keydown);   
+    canvas.addEventListener('keyup', keyup);   
   }
 
   function keydown(event){
+    console.log("Keydown"+event.keyIdentifier); 
     switch(event.keyIdentifier) {
-      case "Right":   SocketHandler.sendRight();  break;
-      case "Left":    SocketHandler.sendLeft();   break;
-      case "Up":      SocketHandler.sendUp();     break;
-      case "Down":    SocketHandler.sendDown();   break;
+      //case "Right":   SocketHandler.sendTurn("right");      break;
+      //case "Left":    SocketHandler.sendTurn("left");       break;
+      case "Up":      SocketHandler.sendAccel("forward");   break;
+      case "Down":    SocketHandler.sendAccel("reverse");   break;
+      default: console.log("Keydown"+event.keyIdentifier); 
     }
     event.preventDefault();    
   }
   function keyup(event){
-    console.log("Keyup"+event); 
+    console.log("Keyup"+event.keyIdentifier); 
+    switch(event.keyIdentifier) {
+      case "Up":        SocketHandler.sendAccel("off");   break;
+      case "Down":      SocketHandler.sendAccel("off");   break;
+      default: console.log("Keyup"+event.keyIdentifier); 
+    }
+    event.preventDefault();    
   }
 
   return my;

@@ -6,35 +6,54 @@ defmodule WebsocketHandler do
   end
 
   def websocket_init(_TransportName, req, _opts) do
-    :erlang.start_timer(1000, self(), "Hello!")          
-    {:ok, req, :undefined_state}
+    IO.puts "init.  Starting timer"
+    :erlang.start_timer(500, self(), [])
+    {:ok, req, :undefined_state }
   end
 
   def websocket_handle({:text, msg}, req, state) do
-    {:ok, json} = JSON.decode(msg)
-    delta = %{ x: HashDict.get(json, "x"), y: HashDict.get(json, "y")}
-    IO.puts inspect(delta)
-    tank(state) |> SimpleTank.Tank.update_position(delta)
-    {:ok, req, state}
+    {:ok, json} = JSEX.decode(msg)
+    #delta = %{ x: HashDict.get(json, "x"), y: HashDict.get(json, "y")}
+    IO.puts inspect(json)
+    {:ok, req, handle_message(state, json)}
   end
-
   def websocket_handle(_rata, req, state) do    
     {:ok, req, state}
   end
+  
+  def handle_message(state, %{ "acceleration" => "forward" }) do
+    tank(state) |> SimpleTank.Tank.accelerate()
+    state
+  end
+  def handle_message(state, %{ "acceleration" => "reverse" }) do
+    tank(state) |> SimpleTank.Tank.decelerate()
+    state
+  end
+  def handle_message(state, message) do
+    IO.puts "unhandled message:  #{inspect(message)}"
+    state
+  end
+
 
   def websocket_info({timeout, _ref, msg}, req, state) do
+    #IO.puts "info. received with #{inspect(msg)}"
+    #SimpleTank.Tank.update(tank(state))
     position = SimpleTank.Tank.get_position(tank(state))
-    {:ok, json} = JSON.encode([ position: [x: position.x, y: position.y] ])
+    #position = SimpleTank.Tank.get_position(tank2(state))
+    {:ok, json} = JSEX.encode([ position: [x: position.x, y: position.y] ])
     :erlang.start_timer(50, self(), json )
     {:reply, {:text, msg}, req, state}
   end
 
+  def websocket_info(_info, req, state) do
+    {:ok, req, state}
+  end
+  
   def tank(_state) do
     SimpleTank.TankList.get_tank(:tank_01)
   end
-
-  def websocket_info(_info, req, state) do
-    {:ok, req, state}
+  def tank2(_state) do
+    SimpleTank.TankList.get_tank(:tank_02)
   end
 
   def websocket_terminate(_reason, _req, _state) do

@@ -1,0 +1,30 @@
+# back-end states (pseudocode)
+
+Tank :  {
+  physics : Physics,
+  controlState : ControlState
+}
+
+Physics: {
+  LastUpdated: timestamp,
+  Position: {x,y},
+  Orientation: {angle},
+  Speed: { v }
+}
+
+ControlState: {
+  LastCommandReceived: timestamp,
+  acceleration: [forward|off|reverse],
+  rotation: [left|off|right]
+}
+
+
+# Incoming JSON messages
+
+{ acceleration: [forward|off|reverse] }
+
+# Outgoing JSON messages
+
+{ x: xpos, y: ypos }
+
+

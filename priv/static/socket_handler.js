@@ -16,19 +16,12 @@ var SocketHandler = (function(){
     $("#connected").hide(); 	
     $("#messages").hide(); 	
   };
-  my.sendUp = function() {
-    sendDir({ x: 0, y: -1 * moveScale})
+  my.sendAccel = function(msg) {
+    sendJSON({ acceleration: msg})
   };
-  my.sendDown = function() {
-    sendDir({ x: 0, y: moveScale})
+  my.sendTurn = function(msg) {
+    sendJSON({ rotation: msg})
   };
-  my.sendLeft = function() {
-    sendDir({ x: -1 * moveScale, y: 0})
-  };
-  my.sendRight = function() {
-    sendDir({ x: moveScale, y: 0})
-  };
-
 
   // Private methods
   function connect() {
@@ -53,10 +46,11 @@ var SocketHandler = (function(){
     };
   };
 
-  function sendDir(message) {
+  function sendJSON(message) {
     if(websocket.readyState == websocket.OPEN){
-      websocket.send(JSON.stringify(message));
-      showScreen('sending: (' + message.x + ', ' + message.y + ')'); 
+      string_message = JSON.stringify(message);
+      websocket.send(string_message);
+      showScreen('sending: ' + string_message); 
     } else {
       showScreen('websocket is not connected'); 
     };
@@ -83,8 +77,8 @@ var SocketHandler = (function(){
   }
 
   function onMessage(evt) { 
-    //console.log(evt.data);
-    try {
+    console.log(evt.data);
+    //try {
       message = JSON.parse(evt.data);
       if ( message.position !== undefined) {
         updatePosition(message.position);
@@ -92,14 +86,19 @@ var SocketHandler = (function(){
       else {
         showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
       }
-    } catch(err) {
-      console.log(err);
+    //} catch(err) {
+      //console.log(err); 
       //console.log("Could not JSON parse event message: "+evt.data)
-    }
+    //}
   };  
 
   function onError(evt) {
-    showScreen('<span style="color: red;">ERROR: ' + evt.data+ '</span>');
+    if (evt.data !== undefined) {
+      showScreen('<span style="color: red;">ERROR: ' + evt.data + '</span>');
+    } else {
+      showScreen('<span style="color: red;">UNKNOWN ERROR: ' + evt + '</span>');
+    }
+
   };
 
   function showScreen(txt) { 

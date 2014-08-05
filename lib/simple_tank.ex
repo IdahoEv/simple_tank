@@ -12,6 +12,11 @@ defmodule SimpleTank do
                                    [{:port, 8080}],  
                                    [{ :env, [{:dispatch, dispatch}]}]
                                    ) 
+
+    device = File.open!("dbg.log", [:write])
+    Application.put_env(:dbg, :device, device) 
+    #IEx.configure([colors: [enabled: false]]) 
+    Dbg.reset                               
     SimpleTank.Supervisor.start_link []
   end
 end

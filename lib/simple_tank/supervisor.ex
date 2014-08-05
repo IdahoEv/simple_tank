@@ -12,8 +12,8 @@ defmodule SimpleTank.Supervisor do
        Supervisor.start_child(sup, worker(SimpleTank.TankList, []))
 
     tanks = [ 
-      _tank_spec("01", tank_list),
-      _tank_spec("02", tank_list)
+      _tank_spec("01", tank_list)
+      #_tank_spec("02", tank_list)
     ]
     Enum.each tanks, fn(tank) -> 
       IO.puts "Attempting to start tank:"
