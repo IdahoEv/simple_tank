@@ -1,20 +1,13 @@
 var GameWindow = (function () {
-	var my = {},
-		//privateVariable = 1,
+  var my = {},
     canvas,
     context,
     width,
     height,
-    scale = 16;   // pixels per unit size. Tank height/width is 1.0 unit size.
-  
-	//function privateMethod() {
-		//// ...
-	//}
+    scale = 16,   // pixels per unit size. Tank height/width is 1.0 unit size.
+    tankImage;
 
-	//my.moduleProperty = 1;
-	//my.moduleMethod = function () {
-		//// ...
-	//};
+  var imageObj = new Image();
 
 
   function drawField() {
@@ -38,15 +31,18 @@ var GameWindow = (function () {
     width = canvas.width;
     height = canvas.height;
     context.translate( (width / 2.0), (height / 2.0) );
+    tankImage = new Image();
+    tankImage.src = '/static/images/tank.png';
   }
   
   my.draw = function(tank){
     drawField();
     tankCoords = scaleCoords(tank);
-    context.beginPath();
-    context.rect(tankCoords.x - scale/2, tankCoords.y - scale/2, scale, scale);
-    context.fillStyle = 'black';
-    context.fill();
+    context.drawImage(tankImage, tankCoords.x - scale/2, tankCoords.y - scale/2);
+    //context.beginPath();
+    //context.rect( scale, scale);
+    //context.fillStyle = 'black';
+    //context.fill();
   }
 
 	return my;

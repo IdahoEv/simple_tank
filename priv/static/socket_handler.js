@@ -16,12 +16,17 @@ var SocketHandler = (function(){
     $("#connected").hide(); 	
     $("#messages").hide(); 	
   };
-  my.sendAccel = function(msg) {
-    sendJSON({ acceleration: msg})
-  };
-  my.sendTurn = function(msg) {
-    sendJSON({ rotation: msg})
-  };
+  my.transmit = function(category, command) {
+    obj = {};
+    obj[category] = command;
+    sendJSON(obj);
+  }
+  //my.sendAccel = function(msg) {
+    //sendJSON({ acceleration: msg})
+  //};
+  //my.sendTurn = function(msg) {
+    //sendJSON({ rotation: msg})
+  //};
 
   // Private methods
   function connect() {

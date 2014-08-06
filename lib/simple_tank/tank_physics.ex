@@ -4,17 +4,17 @@ defmodule SimpleTank.TankPhysics do
             rotation: :math.pi / -2.0,
             speed: 0.0
 
-  @forward_acceleration 1.0
-  @forward_braking 1.5
+  @forward_acceleration 1.75
+  @forward_braking 2.0
   @max_forward_speed 4.0
 
-  @reverse_acceleration 0.5
-  @reverse_braking 1.5
+  @reverse_acceleration 0.75
+  @reverse_braking 2.0
   @max_reverse_speed -2.0
 
   # fraction of the speed lost per second at coast
-  @coasting_decel_rate 0.6
-  @minimum_speed 0.2
+  @coasting_decel_rate 0.75
+  @minimum_speed 0.30
             
   def update(physics, control_state ) do
     { delta, now } = SimpleTank.Time.delta( physics.last_updated)
