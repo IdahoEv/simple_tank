@@ -66,22 +66,24 @@ var SocketHandler = (function(){
     showScreen('<span style="color: red;">DISCONNECTED </span>');
   };  
 
-  function updatePosition(position) {
-    var x = message.position.x;
-    var y = message.position.y;
-    $('#position').html( Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) );
-    console.log("Drawing tank at: "+x+ ", "+y);
+  function updateTankState(tank_state) {
+    var x = tank_state.position.x;
+    var y = tank_state.position.y;
+    $('#position').html( "(" + Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) +")  "
+        + Number(tank_state.speed.toFixed(3))
+        );
+    //console.log("Drawing tank at: "+x+ ", "+y);
     GameWindow.draw({x: x, y: y});
     messages++;
     $('#message_count').html(messages);
   }
 
   function onMessage(evt) { 
-    console.log(evt.data);
+    //console.log(evt.data);
     //try {
       message = JSON.parse(evt.data);
       if ( message.position !== undefined) {
-        updatePosition(message.position);
+        updateTankState(message);
       }
       else {
         showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 

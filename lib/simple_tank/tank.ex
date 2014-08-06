@@ -3,9 +3,10 @@ defmodule SimpleTank.Tank do
 
   @update_interval 20
 
-  defstruct physics: %SimpleTank.TankPhysics{},
-     name: :"",
-     tank_list_pid: 0
+  defstruct  physics: %SimpleTank.TankPhysics{},
+             control_state: %SimpleTank.TankControlState{},
+             name: :"",
+             tank_list_pid: 0
 
 
   def start_link({ name, tank_list_pid}) do
@@ -18,11 +19,8 @@ defmodule SimpleTank.Tank do
       name: name 
   end
 
-  def accelerate(pid) do
-    GenServer.cast pid, :accelerate
-  end
-  def decelerate(pid) do
-    GenServer.cast pid, :decelerate
+  def accelerate(pid, command) do
+    GenServer.cast pid, { :accelerate, command }
   end
   def update(pid) do
     GenServer.cast pid, :update
@@ -30,8 +28,8 @@ defmodule SimpleTank.Tank do
   #def update_position(pid, delta) do
     #GenServer.cast pid, { :update_position, delta }
   #end
-  def get_position(pid) do
-    GenServer.call pid, :get_position
+  def get_public_state(pid) do
+    GenServer.call pid, :get_public_state
   end
 
 
@@ -42,25 +40,23 @@ defmodule SimpleTank.Tank do
     { :ok, tank }
   end
 
-  def handle_call(:get_position, _from, tank  ) do
-    { :reply, tank.physics.position, tank }
+  def handle_call(:get_public_state, _from, tank  ) do
+    { :reply, tank.physics, tank }
   end
 
-  def handle_cast(:accelerate, tank  ) do
-    new_tank = %{ tank | physics: SimpleTank.TankPhysics.accelerate( tank.physics) } 
-    #IO.puts "(Tank) new tank: #{inspect(new_tank)}"
+  def handle_cast({ :accelerate, command}, tank  ) do
+    new_tank = %{ tank | control_state: SimpleTank.TankControlState.accelerate(tank.control_state, command) }   
     { :noreply, new_tank }
   end
 
-  def handle_cast(:decelerate, tank  ) do
-    new_tank = %{ tank | physics: SimpleTank.TankPhysics.decelerate( tank.physics) } 
-    #IO.puts "(Tank) new tank: #{inspect(new_tank)}"
-    { :noreply, new_tank }
-  end
 
   def handle_cast(:update, tank  ) do
+    cs = SimpleTank.TankControlState.update( tank.control_state )
+    physics = SimpleTank.TankPhysics.update( tank.physics, cs )
+
     #IO.puts "(Tank handle_cast) Updating tank: #{inspect(self)}, #{tank.name}"
-    new_tank = %{ tank | physics: SimpleTank.TankPhysics.update( tank.physics) } 
+    new_tank = %{ tank | physics: physics, control_state: cs }
+  
     :erlang.send_after(@update_interval, self, { :"$gen_cast", :update } )
     { :noreply, new_tank }
   end

@@ -14,19 +14,15 @@ defmodule WebsocketHandler do
   def websocket_handle({:text, msg}, req, state) do
     {:ok, json} = JSEX.decode(msg)
     #delta = %{ x: HashDict.get(json, "x"), y: HashDict.get(json, "y")}
-    IO.puts inspect(json)
+    #IO.puts inspect(json)
     {:ok, req, handle_message(state, json)}
   end
   def websocket_handle(_rata, req, state) do    
     {:ok, req, state}
   end
   
-  def handle_message(state, %{ "acceleration" => "forward" }) do
-    tank(state) |> SimpleTank.Tank.accelerate()
-    state
-  end
-  def handle_message(state, %{ "acceleration" => "reverse" }) do
-    tank(state) |> SimpleTank.Tank.decelerate()
+  def handle_message(state, %{ "acceleration" => direction }) do
+    tank(state) |> SimpleTank.Tank.accelerate(direction)
     state
   end
   def handle_message(state, message) do
@@ -38,9 +34,10 @@ defmodule WebsocketHandler do
   def websocket_info({timeout, _ref, msg}, req, state) do
     #IO.puts "info. received with #{inspect(msg)}"
     #SimpleTank.Tank.update(tank(state))
-    position = SimpleTank.Tank.get_position(tank(state))
+    physics = SimpleTank.Tank.get_public_state(tank(state))
     #position = SimpleTank.Tank.get_position(tank2(state))
-    {:ok, json} = JSEX.encode([ position: [x: position.x, y: position.y] ])
+    {:ok, json} = JSEX.encode(physics)
+    #{:ok, json} = JSEX.encode([ position: [x: position.x, y: position.y],  ])
     :erlang.start_timer(50, self(), json )
     {:reply, {:text, msg}, req, state}
   end
