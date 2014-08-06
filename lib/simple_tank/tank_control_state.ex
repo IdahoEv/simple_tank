@@ -13,9 +13,18 @@ defmodule SimpleTank.TankControlState do
   def accelerate( _, msg) do
     raise "Unhandled acceleration command #{msg}"
   end
+  def rotate( cs, "left" ),   do: set_rotation(cs,:left)
+  def rotate( cs, "right" ),  do: set_rotation(cs,:right)
+  def rotate( cs, "off" ),    do: set_rotation(cs,:off)
+  def rotate( _, msg) do
+    raise "Unhandled rotation command #{msg}"
+  end
 
   def set_accel(cs, atom) do
     %{ cs | acceleration: %{state: atom, last_message: SimpleTank.Time.now}}
+  end
+  def set_rotation(cs, atom) do
+    %{ cs | rotation: %{state: atom, last_message: SimpleTank.Time.now}}
   end
 
   

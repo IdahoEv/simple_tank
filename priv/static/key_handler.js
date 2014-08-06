@@ -15,14 +15,18 @@ var KeyHandler = (function(){
       //case "Left":    SocketHandler.sendTurn("left");       break;
       case "Up":      transmit("acceleration","forward",event);   break;
       case "Down":    transmit("acceleration","reverse",event);   break;
+      case "Left":    transmit("rotation",    "left",   event);      break;
+      case "Right":   transmit("rotation",    "right",  event);   break;
       default: console.log("Keydown"+event.keyIdentifier); 
     }
   }
   function keyup(event){
     console.log("Keyup"+event.keyIdentifier); 
     switch(event.keyIdentifier) {
-      case "Up":        transmit("acceleration","off", event);   break;
-      case "Down":      transmit("acceleration","off", event);   break;
+      case "Up":      transmit("acceleration","off", event);   break;
+      case "Down":    transmit("acceleration","off", event);   break;
+      case "Left":    transmit("rotation",    "off", event);   break;
+      case "Right":   transmit("rotation",    "off", event);   break;
       default: console.log("Keyup"+event.keyIdentifier); 
     }
   }

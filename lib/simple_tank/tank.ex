@@ -22,6 +22,9 @@ defmodule SimpleTank.Tank do
   def accelerate(pid, command) do
     GenServer.cast pid, { :accelerate, command }
   end
+  def rotate(pid, command) do
+    GenServer.cast pid, { :rotate, command }
+  end
   def update(pid) do
     GenServer.cast pid, :update
   end
@@ -48,7 +51,10 @@ defmodule SimpleTank.Tank do
     new_tank = %{ tank | control_state: SimpleTank.TankControlState.accelerate(tank.control_state, command) }   
     { :noreply, new_tank }
   end
-
+  def handle_cast({ :rotate, command}, tank  ) do
+    new_tank = %{ tank | control_state: SimpleTank.TankControlState.rotate(tank.control_state, command) }   
+    { :noreply, new_tank }
+  end
 
   def handle_cast(:update, tank  ) do
     cs = SimpleTank.TankControlState.update( tank.control_state )

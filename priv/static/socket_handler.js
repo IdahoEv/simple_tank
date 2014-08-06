@@ -74,8 +74,9 @@ var SocketHandler = (function(){
   function updateTankState(tank_state) {
     var x = tank_state.position.x;
     var y = tank_state.position.y;
-    $('#position').html( "(" + Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) +")  "
-        + Number(tank_state.speed.toFixed(3))
+    $('#position').html( "(" + Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) +") "
+        + " speed: " + Number(tank_state.speed.toFixed(3)) 
+        + " rotation: " + Number(tank_state.rotation.toFixed(2))
         );
     //console.log("Drawing tank at: "+x+ ", "+y);
     GameWindow.draw({x: x, y: y});
