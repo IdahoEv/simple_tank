@@ -21,12 +21,9 @@ defmodule WebsocketHandler do
     {:ok, req, state}
   end
   
-  def handle_message(state, %{ "acceleration" => direction }) do
-    tank(state) |> SimpleTank.Tank.accelerate(direction)
-    state
-  end
-  def handle_message(state, %{ "rotation" => direction }) do
-    tank(state) |> SimpleTank.Tank.rotate(direction)
+  def handle_message(state, %{ "acceleration" => a_direction, "rotation" => r_direction }) do    
+    tank(state) |> SimpleTank.Tank.accelerate(a_direction) 
+    tank(state) |> SimpleTank.Tank.rotate(r_direction)
     state
   end
   def handle_message(state, message) do

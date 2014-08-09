@@ -24,6 +24,7 @@ defmodule SimpleTank.TankControlState do
     %{ cs | acceleration: %{state: atom, last_message: SimpleTank.Time.now}}
   end
   def set_rotation(cs, atom) do
+    IO.puts "Rotation command: #{inspect(cs)}"
     %{ cs | rotation: %{state: atom, last_message: SimpleTank.Time.now}}
   end
 

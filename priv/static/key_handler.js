@@ -1,6 +1,7 @@
 var KeyHandler = (function(){
   var my = {},
-    control_state; 
+    control_state,
+    timeout_loop; 
 
   my.init = function(){
     control_state = { acceleration: 'off', rotation: 'off' };
@@ -25,6 +26,10 @@ var KeyHandler = (function(){
 
   function transmit() {
     SocketHandler.transmit(control_state);
+
+    // every 600ms, re-transmit state to the server to prevent unintentional decay
+    clearTimeout(timeout_loop);
+    timeout_loop = setTimeout(function() { transmit() }, 600);
   }
 
   return my;
