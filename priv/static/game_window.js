@@ -6,6 +6,8 @@ var GameWindow = (function () {
     key_handler,
     tank_state,
     sprite,
+    default_width = 800,
+    default_height = 600,
     scale = 32;   // pixels per unit size. Tank height/width is 1.0 unit size.
 
   var imageObj = new Image();
@@ -42,7 +44,7 @@ var GameWindow = (function () {
     console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
     sprite.x = game.world.centerX + (scale*tank_state.position.x);
     sprite.y = game.world.centerY + (scale*tank_state.position.y);
-    //sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
+    sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
   }
 
   my.init = function(kh) {
@@ -52,7 +54,7 @@ var GameWindow = (function () {
              orientation: Math.PI / 2.0
            } 
 
-    game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameField', 
+    game = new Phaser.Game(default_width, default_height, Phaser.AUTO, 'gameField', 
         { preload: preload, 
           create: create,
           update: update });

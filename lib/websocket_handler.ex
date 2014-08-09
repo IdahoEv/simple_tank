@@ -33,12 +33,8 @@ defmodule WebsocketHandler do
 
 
   def websocket_info({timeout, _ref, msg}, req, state) do
-    #IO.puts "info. received with #{inspect(msg)}"
-    #SimpleTank.Tank.update(tank(state))
     physics = SimpleTank.Tank.get_public_state(tank(state))
-    #position = SimpleTank.Tank.get_position(tank2(state))
     {:ok, json} = JSEX.encode(physics)
-    #{:ok, json} = JSEX.encode([ position: [x: position.x, y: position.y],  ])
     :erlang.start_timer(50, self(), json )
     {:reply, {:text, msg}, req, state}
   end

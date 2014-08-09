@@ -5,11 +5,11 @@ defmodule SimpleTank.TankPhysics do
             speed: 0.0
 
   @forward_acceleration 1.75
-  @forward_braking 2.0
+  @forward_braking 3.0
   @max_forward_speed 4.0
 
   @reverse_acceleration 0.75
-  @reverse_braking 2.0
+  @reverse_braking 3.0
   @max_reverse_speed -2.0
 
   # fraction of the speed lost per second at coast

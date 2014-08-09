@@ -47,7 +47,7 @@ var SocketHandler = (function(){
     if(websocket.readyState == websocket.OPEN){
       string_message = JSON.stringify(message);
       websocket.send(string_message);
-      showScreen('sending: ' + string_message); 
+      showScreen(string_message); 
     } else {
       showScreen('websocket is not connected'); 
     };
