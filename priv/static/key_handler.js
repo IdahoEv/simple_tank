@@ -1,38 +1,30 @@
 var KeyHandler = (function(){
   var my = {},
-    canvas;
+    control_state; 
 
   my.init = function(){
-    canvas = GameWindow.canvas;
-    canvas.addEventListener('keydown', keydown);
-    canvas.addEventListener('keyup', keyup);   
+    control_state = { acceleration: 'off', rotation: 'off' };
   }
 
-  function keydown(event){
-    console.log("Keydown"+event.keyIdentifier); 
-    switch(event.keyIdentifier) {
-      //case "Right":   SocketHandler.sendTurn("right");      break;
-      //case "Left":    SocketHandler.sendTurn("left");       break;
-      case "Up":      transmit("acceleration","forward",event);   break;
-      case "Down":    transmit("acceleration","reverse",event);   break;
-      case "Left":    transmit("rotation",    "left",   event);      break;
-      case "Right":   transmit("rotation",    "right",  event);   break;
-      default: console.log("Keydown"+event.keyIdentifier); 
+  my.keyUpUp      = function() { updateState("acceleration", "off") } 
+  my.keyUpDown    = function() { updateState("acceleration", "forward") } 
+  my.keyDownUp    = function() { updateState("acceleration", "off") } 
+  my.keyDownDown  = function() { updateState("acceleration", "reverse") } 
+  my.keyLeftUp    = function() { updateState("rotation", "off") } 
+  my.keyLeftDown  = function() { updateState("rotation", "left") } 
+  my.keyRightUp   = function() { updateState("rotation", "off") } 
+  my.keyRightDown = function() { updateState("rotation", "right") } 
+  
+  function updateState(control, state) { 
+    console.log('updateState called')
+    if (control_state[control] != state) {
+      control_state[control] = state;
+      transmit();
     }
   }
-  function keyup(event){
-    console.log("Keyup"+event.keyIdentifier); 
-    switch(event.keyIdentifier) {
-      case "Up":      transmit("acceleration","off", event);   break;
-      case "Down":    transmit("acceleration","off", event);   break;
-      case "Left":    transmit("rotation",    "off", event);   break;
-      case "Right":   transmit("rotation",    "off", event);   break;
-      default: console.log("Keyup"+event.keyIdentifier); 
-    }
-  }
-  function transmit(type, command, event) {
-    SocketHandler.transmit(type, command);
-    event.preventDefault();
+
+  function transmit() {
+    SocketHandler.transmit(control_state);
   }
 
   return my;

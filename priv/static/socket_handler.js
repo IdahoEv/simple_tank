@@ -16,17 +16,9 @@ var SocketHandler = (function(){
     $("#connected").hide(); 	
     $("#messages").hide(); 	
   };
-  my.transmit = function(category, command) {
-    obj = {};
-    obj[category] = command;
-    sendJSON(obj);
+  my.transmit = function(object) {
+    sendJSON(object);
   }
-  //my.sendAccel = function(msg) {
-    //sendJSON({ acceleration: msg})
-  //};
-  //my.sendTurn = function(msg) {
-    //sendJSON({ rotation: msg})
-  //};
 
   // Private methods
   function connect() {
@@ -79,7 +71,7 @@ var SocketHandler = (function(){
         + " rotation: " + Number(tank_state.rotation.toFixed(2))
         );
     //console.log("Drawing tank at: "+x+ ", "+y);
-    GameWindow.draw({x: x, y: y});
+    GameWindow.update_tank(tank_state);
     messages++;
     $('#message_count').html(messages);
   }

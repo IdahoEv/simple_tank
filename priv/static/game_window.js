@@ -1,49 +1,68 @@
 var GameWindow = (function () {
+
+
   var my = {},
-    canvas,
-    context,
-    width,
-    height,
-    scale = 16,   // pixels per unit size. Tank height/width is 1.0 unit size.
-    tankImage;
+    game,
+    key_handler,
+    tank_state,
+    sprite,
+    scale = 32;   // pixels per unit size. Tank height/width is 1.0 unit size.
 
   var imageObj = new Image();
 
-
-  function drawField() {
-    context.beginPath();
-    context.rect(width / -2, height / -2, width, height);
-    context.fillStyle = '#99CA99';
-    context.fill();
+  function preload() {
+    game.load.image('tank', '/static/images/tank-32.png');
   }
+ 
+  function create() {
+    //game.world.scale = new Phaser.Point(0.5,0.5);
+    
+    game.stage.backgroundColor = "90fa60";
+    //game.physics.startSystem(Phaser.Physics.ARCADE);
+    sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
 
-  function scaleCoords(coords){
-    return { 
-      x: (coords.x * scale),
-      y: (coords.y * scale)
+    sprite.anchor.setTo('0.5', '0.5');
+    //game.physics.enable(sprite, Phaser.Physics.ARCADE);
+    //sprite.body.allowRotation = false;
+
+    keys = [[ "UP",    KeyHandler.keyUpDown,    KeyHandler.keyUpUp ],
+            [ "DOWN",  KeyHandler.keyDownDown,  KeyHandler.keyDownUp ],
+            [ "LEFT",  KeyHandler.keyLeftDown,  KeyHandler.keyLeftUp ],
+            [ "RIGHT", KeyHandler.keyRightDown, KeyHandler.keyRightUp ]]
+
+    for (i=0; i < keys.length; i++ ) {
+      key = game.input.keyboard.addKey(Phaser.Keyboard[keys[i][0]]);
+      key.onDown.add(keys[i][1]);
+      key.onUp.add(keys[i][2]);
     }
   }
 
-  my.init = function() {
-    canvas = document.getElementById('gameCanvas');
-    context = canvas.getContext('2d');
-    my.canvas = canvas;
-    width = canvas.width;
-    height = canvas.height;
-    context.translate( (width / 2.0), (height / 2.0) );
-    tankImage = new Image();
-    tankImage.src = '/static/images/tank.png';
-  }
-  
-  my.draw = function(tank){
-    drawField();
-    tankCoords = scaleCoords(tank);
-    context.drawImage(tankImage, tankCoords.x - scale/2, tankCoords.y - scale/2);
-    //context.beginPath();
-    //context.rect( scale, scale);
-    //context.fillStyle = 'black';
-    //context.fill();
+
+  function update() {
+    console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
+    sprite.x = game.world.centerX + (scale*tank_state.position.x);
+    sprite.y = game.world.centerY + (scale*tank_state.position.y);
+    //sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
   }
 
-	return my;
+  my.init = function(kh) {
+    key_handler = kh;
+    tank_state = { position: { x: 0, y: 0},
+             speed: 0,
+             orientation: Math.PI / 2.0
+           } 
+
+    game = new Phaser.Game(800, 600, Phaser.AUTO, 'gameField', 
+        { preload: preload, 
+          create: create,
+          update: update });
+
+  }
+
+  my.update_tank = function(new_tank_state) {
+    tank_state = new_tank_state;
+  }
+  
+  
+  return my;
 }());
