@@ -28,7 +28,10 @@ defmodule SimpleTank.BulletList do
   end
 
   def handle_cast(:update, bullet_list) do
-    new_list = Enum.map(bullet_list, fn(bul) -> SimpleTank.Bullet.update(bul) end)
+    new_list = Enum.filter_map(bullet_list, 
+       fn(bul) -> SimpleTank.Bullet.alive?(bul) end,
+       fn(bul) -> SimpleTank.Bullet.update(bul) end
+    )
     IO.puts "Bullet list: #{inspect(bullet_list)}"
     :erlang.send_after(@update_interval, self, { :"$gen_cast", :update } )
     { :noreply, new_list }

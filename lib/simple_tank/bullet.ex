@@ -17,13 +17,18 @@ defmodule SimpleTank.Bullet do
     }
   end
 
+  def alive?(bullet) do
+    { age, _ } = SimpleTank.Time.delta( bullet.fired )
+    if (age > @lifetime) do
+      false
+    else
+      bullet
+    end
+  end
+
   def update(nil), do: nil
   def update(bullet ) do
-    { age, now } = SimpleTank.Time.delta( bullet.fired )
-    if (age > @lifetime) do
-      nil
-    else
-      { delta, now } = SimpleTank.Time.delta( now, bullet.last_updated)
+      { delta, now } = SimpleTank.Time.delta( bullet.last_updated)
 
       px = bullet.velocity.x * delta + bullet.position.x
       py = bullet.velocity.y * delta + bullet.position.y
@@ -31,7 +36,6 @@ defmodule SimpleTank.Bullet do
                                position: %{ x: px, y: py }
       }
       new_bullet
-    end
   end
 
   def velocity(rotation, speed) do
