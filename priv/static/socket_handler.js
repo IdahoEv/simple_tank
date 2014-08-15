@@ -75,13 +75,17 @@ var SocketHandler = (function(){
     messages++;
     $('#message_count').html(messages);
   }
+  function updateBulletList(bullet_list) {
+    GameWindow.update_bullet_list(bullet_list);
+  }
 
   function onMessage(evt) { 
     //console.log(evt.data);
     //try {
       message = JSON.parse(evt.data);
-      if ( message.position !== undefined) {
-        updateTankState(message);
+      if ( message.player_tank_physics !== undefined) {
+        updateTankState(message["player_tank_physics"]);
+        updateBulletList(message["bullet_list"]);
       }
       else {
         showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 

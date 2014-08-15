@@ -25,7 +25,7 @@ defmodule WebsocketHandler do
                                "rotation" => r_direction,
                                "trigger" => t_state
                              }) do    
-    tank(state) |> SimpleTank.Tank.update_controls(
+    tank_pid(state) |> SimpleTank.Tank.update_controls(
       %{ "acceleration" => a_direction,
          "rotation" => r_direction,
          "trigger" => t_state
@@ -40,8 +40,12 @@ defmodule WebsocketHandler do
 
 
   def websocket_info({timeout, _ref, msg}, req, state) do
-    physics = SimpleTank.Tank.get_public_state(tank(state))
-    {:ok, json} = JSEX.encode(physics)
+    physics = SimpleTank.Tank.get_public_state(tank_pid(state))
+    bullets = SimpleTank.BulletList.get(bullet_list_pid(state))
+    {:ok, json} = JSEX.encode(%{ 
+      player_tank_physics: physics,
+      bullet_list: bullets
+    })
     :erlang.start_timer(50, self(), json )
     {:reply, {:text, msg}, req, state}
   end
@@ -49,8 +53,12 @@ defmodule WebsocketHandler do
   def websocket_info(_info, req, state) do
     {:ok, req, state}
   end
+
+  def bullet_list_pid(_state) do
+    :bullet_list    
+  end
   
-  def tank(_state) do
+  def tank_pid(_state) do
     SimpleTank.TankList.get_tank(:tank_01)
   end
   def tank2(_state) do

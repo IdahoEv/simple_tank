@@ -37,7 +37,7 @@ defmodule SimpleTank.BulletList do
     { :noreply, new_list }
   end
 
-  def handle_call(:get, bullet_list) do
+  def handle_call(:get, _from, bullet_list) do
     { :reply, bullet_list, bullet_list }
   end
 

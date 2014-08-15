@@ -4,7 +4,9 @@ var GameWindow = (function () {
   var my = {},
     game,
     key_handler,
-    tank_state,
+    tank_state = {},
+    bullet_list = [],
+    bullet_sprites = [],
     sprite,
     default_width = 500,
     default_height = 500,
@@ -14,6 +16,7 @@ var GameWindow = (function () {
 
   function preload() {
     game.load.image('tank', '/static/images/tank-32.png');
+    game.load.image('shell', '/static/images/shell-32.png');
   }
  
   function create() {
@@ -34,10 +37,14 @@ var GameWindow = (function () {
             [ "SPACEBAR", KeyHandler.keyFireDown,  KeyHandler.keyFireUp ]
             ]
 
-    for (i=0; i < keys.length; i++ ) {
+    for (var i=0; i < keys.length; i++ ) {
       key = game.input.keyboard.addKey(Phaser.Keyboard[keys[i][0]]);
       key.onDown.add(keys[i][1]);
       key.onUp.add(keys[i][2]);
+    }
+    for (var bn = 0; bn < 31; bn ++) {
+      bullet_sprites[bn] =  game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
+      bullet_sprites[bn].anchor.setTo('0.5', '0.5');
     }
   }
 
@@ -47,6 +54,14 @@ var GameWindow = (function () {
     sprite.x = game.world.centerX + (scale*tank_state.position.x);
     sprite.y = game.world.centerY + (scale*tank_state.position.y);
     sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
+
+    for (var bn = 0; bn < bullet_list.length; bn++) {
+      bullet = bullet_list[bn];
+      bullet_sprite = bullet_sprites[bn];
+      bullet_sprite.x =  game.world.centerX + (scale*bullet.position.x);
+      bullet_sprite.y =  game.world.centerY + (scale*bullet.position.y);
+      bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI) + 90;
+    }
   }
 
   my.init = function(kh) {
@@ -67,6 +82,9 @@ var GameWindow = (function () {
     tank_state = new_tank_state;
   }
   
+  my.update_bullet_list = function(new_bullet_list) {
+    bullet_list = new_bullet_list;
+  }
   
   return my;
 }());

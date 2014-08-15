@@ -2,10 +2,11 @@ defmodule SimpleTank.Bullet do
   defstruct fired: 0,
             last_updated: 0,
             position: %{ x: 0, y: 0},
-            velocity: %{ x: 0, y: 0}
+            velocity: %{ x: 0, y: 0},
+            angle: 0
 
-  @speed    15.0  # units/sec
-  @lifetime 3.0   # sec
+  @speed    10.0  # units/sec
+  @lifetime 2.0   # sec
 
   def new(position, angle) do
     now = SimpleTank.Time.now
@@ -13,7 +14,8 @@ defmodule SimpleTank.Bullet do
        fired: now,
        last_updated: now,
        position: position,
-       velocity: velocity(angle, @speed)
+       velocity: velocity(angle, @speed),
+       angle: angle
     }
   end
 
