@@ -6,8 +6,8 @@ var GameWindow = (function () {
     key_handler,
     tank_state,
     sprite,
-    default_width = 800,
-    default_height = 600,
+    default_width = 500,
+    default_height = 500,
     scale = 32;   // pixels per unit size. Tank height/width is 1.0 unit size.
 
   var imageObj = new Image();

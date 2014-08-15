@@ -10,13 +10,16 @@ defmodule SimpleTank.TankControlState do
   @control_decay 1.0  
 
 
-  def update_controls(cs, new_commands, tank) do
-    if (new_commands.trigger == :on and cs.trigger == :off) do
-      SimpleTank.Tank.fire(tank)
+  def update_controls(cs, new_commands, tank_pid) do
+    new_cs = update_controls(cs, new_commands)
+    IO.puts "cs t #{cs.trigger} ncs t #{new_cs.trigger}"
+    if (new_cs.trigger == :on and cs.trigger == :off) do
+      IO.puts "FIRING!"
+      SimpleTank.Tank.fire(tank_pid)
     end
-    update_controls(cs, new_commands)
+    new_cs
   end
-  def update_controls(cs, new_commands) do
+  defp update_controls(cs, new_commands) do
     # TODO: don't explicitly use to_atom, because it allows DoS attack by sending bad
     # strings. 
     %{ cs | trigger:      String.to_atom(new_commands["trigger"]),      

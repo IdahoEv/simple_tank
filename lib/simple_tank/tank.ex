@@ -39,12 +39,12 @@ defmodule SimpleTank.Tank do
   end
 
   def handle_cast({ :update_controls, controls}, tank  ) do
-    new_tank = %{ tank | control_state: SimpleTank.TankControlState.update_controls(tank.control_state, controls) }   
+    new_tank = %{ tank | control_state: SimpleTank.TankControlState.update_controls(tank.control_state, controls, self) }   
     { :noreply, new_tank }
   end
   def handle_cast( :fire, tank) do
-    BulletList.add_bullet(tank.physics.position, tank.physics.angle)
-    { :noreply, %{ tank | last_fired: SimpleTank.Tank.now } }
+    SimpleTank.BulletList.add_bullet(tank.physics.position, tank.physics.rotation)
+    { :noreply, %{ tank | last_fired: SimpleTank.Time.now } }
   end
 
   def handle_cast(:update, tank  ) do
