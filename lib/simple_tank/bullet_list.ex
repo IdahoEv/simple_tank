@@ -1,7 +1,7 @@
 defmodule SimpleTank.BulletList do
   use GenServer
 
-  @update_interval 1000
+  @update_interval 50
   
   def start_link() do
     GenServer.start_link __MODULE__, [], name: :bullet_list

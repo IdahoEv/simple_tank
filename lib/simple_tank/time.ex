@@ -8,6 +8,10 @@ defmodule SimpleTank.Time do
   end
 
   def delta(old_time) do
+    delta(now, old_time)
+  end
+  
+  def delta(new_time, old_time) do
     new_time = now
     { new_time - old_time, new_time }
   end

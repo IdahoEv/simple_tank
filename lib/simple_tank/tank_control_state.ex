@@ -12,7 +12,6 @@ defmodule SimpleTank.TankControlState do
 
   def update_controls(cs, new_commands, tank_pid) do
     new_cs = update_controls(cs, new_commands)
-    IO.puts "cs t #{cs.trigger} ncs t #{new_cs.trigger}"
     if (new_cs.trigger == :on and cs.trigger == :off) do
       IO.puts "FIRING!"
       SimpleTank.Tank.fire(tank_pid)
