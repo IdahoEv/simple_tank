@@ -1,13 +1,12 @@
 defmodule SimpleTank.BulletList do
   use GenServer
 
-  @update_interval 50
+  @update_interval 20
   
   def start_link() do
     GenServer.start_link __MODULE__, [], name: :bullet_list
   end
   def add_bullet(position, angle) do
-    IO.puts "ADDING BULLET"
     GenServer.cast(:bullet_list, { :add_bullet, SimpleTank.Bullet.new(position, angle) })
   end
   def get(pid) do
@@ -32,7 +31,6 @@ defmodule SimpleTank.BulletList do
        fn(bul) -> SimpleTank.Bullet.alive?(bul) end,
        fn(bul) -> SimpleTank.Bullet.update(bul) end
     )
-    IO.puts "Bullet list: #{inspect(bullet_list)}"
     :erlang.send_after(@update_interval, self, { :"$gen_cast", :update } )
     { :noreply, new_list }
   end
