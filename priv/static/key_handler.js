@@ -4,7 +4,7 @@ var KeyHandler = (function(){
     timeout_loop; 
 
   my.init = function(){
-    control_state = { acceleration: 'off', rotation: 'off' };
+    control_state = { acceleration: 'off', rotation: 'off', trigger: 'off' };
   }
 
   my.keyUpUp      = function() { updateState("acceleration", "off") } 
@@ -15,6 +15,8 @@ var KeyHandler = (function(){
   my.keyLeftDown  = function() { updateState("rotation", "left") } 
   my.keyRightUp   = function() { updateState("rotation", "off") } 
   my.keyRightDown = function() { updateState("rotation", "right") } 
+  my.keyFireUp    = function() { updateState("trigger", "off") } 
+  my.keyFireDown  = function() { updateState("trigger", "on") } 
   
   function updateState(control, state) { 
     console.log('updateState called')

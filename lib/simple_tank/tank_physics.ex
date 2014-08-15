@@ -21,8 +21,10 @@ defmodule SimpleTank.TankPhysics do
             
   def update(physics, control_state ) do
     { delta, now } = SimpleTank.Time.delta( physics.last_updated)
-    speed = apply_acceleration(physics.speed, control_state.acceleration.state, delta)
-    rotation = apply_rotation(physics.rotation, control_state.rotation.state, delta)
+    speed = apply_acceleration(physics.speed, control_state.acceleration, delta)
+    #speed = 0.0
+    rotation = 0.0
+    rotation = apply_rotation(physics.rotation, control_state.rotation, delta)
     #IO.puts "rotation state: #{control_state.rotation.state} old: #{physics.rotation} new: #{rotation}"
     vel = velocity(rotation, speed)
     px = vel.x * delta + physics.position.x
@@ -47,6 +49,7 @@ defmodule SimpleTank.TankPhysics do
   def apply_rotation(angle, :right, delta), do: angle + (delta * @rotation_speed)
   def apply_rotation(angle, :off, _),       do: angle 
 
+
   def apply_acceleration(speed, :off, _) when (abs(speed) < @minimum_speed) do 
     0.0
   end
@@ -64,6 +67,14 @@ defmodule SimpleTank.TankPhysics do
   end
   def apply_acceleration(speed, :reverse, delta) when speed > 0 do
     speed - delta * @forward_braking
+  end
+  def apply_acceleration(a, b, c) do
+    IO.puts "Unhandled accel call"
+    IO.puts "A: #{inspect(a)}"
+    IO.puts "B: #{inspect(b)}"
+    IO.puts "C: #{inspect(c)}"
+    raise "Unhandled accel call"
+    System.halt
   end
 
 

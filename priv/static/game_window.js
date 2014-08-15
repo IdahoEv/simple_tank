@@ -30,7 +30,9 @@ var GameWindow = (function () {
     keys = [[ "UP",    KeyHandler.keyUpDown,    KeyHandler.keyUpUp ],
             [ "DOWN",  KeyHandler.keyDownDown,  KeyHandler.keyDownUp ],
             [ "LEFT",  KeyHandler.keyLeftDown,  KeyHandler.keyLeftUp ],
-            [ "RIGHT", KeyHandler.keyRightDown, KeyHandler.keyRightUp ]]
+            [ "RIGHT", KeyHandler.keyRightDown, KeyHandler.keyRightUp ],
+            [ "SPACEBAR", KeyHandler.keyFireDown,  KeyHandler.keyFireUp ]
+            ]
 
     for (i=0; i < keys.length; i++ ) {
       key = game.input.keyboard.addKey(Phaser.Keyboard[keys[i][0]]);

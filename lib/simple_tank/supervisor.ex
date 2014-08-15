@@ -10,6 +10,8 @@ defmodule SimpleTank.Supervisor do
   def start_workers(sup) do
     { :ok, tank_list } = 
        Supervisor.start_child(sup, worker(SimpleTank.TankList, []))
+    { :ok, bullet_list } = 
+       Supervisor.start_child(sup, worker(SimpleTank.BulletList, []))
 
     tanks = [ 
       _tank_spec("01", tank_list)
