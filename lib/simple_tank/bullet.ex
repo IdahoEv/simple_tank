@@ -1,5 +1,6 @@
 defmodule SimpleTank.Bullet do
-  defstruct fired: 0,
+  defstruct id: nil,
+            fired: 0,
             last_updated: 0,
             position: %{ x: 0, y: 0},
             velocity: %{ x: 0, y: 0},
@@ -11,6 +12,7 @@ defmodule SimpleTank.Bullet do
   def new(position, angle) do
     now = SimpleTank.Time.now
     %SimpleTank.Bullet{ 
+       id: SimpleTank.Time.uniq_nanosec,
        fired: now,
        last_updated: now,
        position: position,

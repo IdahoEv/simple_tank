@@ -6,7 +6,7 @@ var GameWindow = (function () {
     key_handler,
     tank_state = {},
     bullet_list = [],
-    bullet_sprites = [],
+    bullet_sprites = {},
     sprite,
     default_width = 500,
     default_height = 500,
@@ -42,26 +42,71 @@ var GameWindow = (function () {
       key.onDown.add(keys[i][1]);
       key.onUp.add(keys[i][2]);
     }
-    for (var bn = 0; bn < 31; bn ++) {
-      bullet_sprites[bn] =  game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
-      bullet_sprites[bn].anchor.setTo('0.5', '0.5');
-    }
+    //for (var bn = 0; bn < 31; bn ++) {
+      //bullet_sprites[bn] =  game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
+      //bullet_sprites[bn].anchor.setTo('0.5', '0.5');
+    //}
+  }
+
+  function makeBulletSprite(bullet) {
+    var bullet_sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
+    bullet_sprite.anchor.setTo('0.5', '0.5')
+    setBulletPosition(bullet_sprite, bullet);
+    bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI) + 90;
+    bullet_sprites[bullet.id] = bullet_sprite
   }
 
 
+  function setBulletPosition(sprite, bullet) {
+    sprite.x =  game.world.centerX + (scale*bullet.position.x);
+    sprite.y =  game.world.centerY + (scale*bullet.position.y);
+  }
+
+   
+
+  function updateBullets() {
+    //console.log("Total bullets/sprites: "+bullet_list.length);
+    //console.log(bullet_sprites);
+        //+ "/" + bullet_sprites.length);
+    var existing_sprite_ids = Object.keys(bullet_sprites);
+    var bullet_sprite;
+
+    // Make sure all listed bullets are updated or created
+    for (var bn = 0; bn < bullet_list.length; bn++) {
+      var bullet = bullet_list[bn];
+
+      // if the sprites array already contains this bullet, update it
+      if (existing_sprite_ids.indexOf(bullet.id.toString()) > -1) {
+        console.log('updating existing sprite');
+        bullet_sprite = bullet_sprites[bullet.id];
+        setBulletPosition(bullet_sprite, bullet);
+        existing_sprite_ids.splice(
+          existing_sprite_ids.indexOf(bullet.id.toString()),1
+        )
+      // otherwise make a new sprite  
+      } else { 
+        console.log('creating new sprite');
+        makeBulletSprite(bullet); 
+      }
+    }
+
+    // remove any bullet sprites that do not exist in the server update
+    for (var sin = 0; sin < existing_sprite_ids.length; sin++) {
+
+      sid = existing_sprite_ids[sin];
+      console.log('deleting sprite with id '+ sid);
+      bullet_sprite = bullet_sprites[sid];
+      bullet_sprite.kill;
+      delete bullet_sprites[sid];
+    }
+  }
+
   function update() {
-    console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
+    //console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
     sprite.x = game.world.centerX + (scale*tank_state.position.x);
     sprite.y = game.world.centerY + (scale*tank_state.position.y);
     sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
-
-    for (var bn = 0; bn < bullet_list.length; bn++) {
-      bullet = bullet_list[bn];
-      bullet_sprite = bullet_sprites[bn];
-      bullet_sprite.x =  game.world.centerX + (scale*bullet.position.x);
-      bullet_sprite.y =  game.world.centerY + (scale*bullet.position.y);
-      bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI) + 90;
-    }
+    updateBullets();
   }
 
   my.init = function(kh) {
