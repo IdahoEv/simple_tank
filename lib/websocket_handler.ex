@@ -13,8 +13,6 @@ defmodule WebsocketHandler do
 
   def websocket_handle({:text, msg}, req, state) do
     {:ok, json} = JSEX.decode(msg)
-    #delta = %{ x: HashDict.get(json, "x"), y: HashDict.get(json, "y")}
-    #IO.puts inspect(json)
     {:ok, req, handle_message(state, json)}
   end
   def websocket_handle(_rata, req, state) do    

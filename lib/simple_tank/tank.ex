@@ -28,7 +28,7 @@ defmodule SimpleTank.Tank do
 
   def init( tank ) do
     SimpleTank.TankList.add_tank(tank.tank_list_pid, tank.name, self)
-    Dbg.trace(self, :messages)
+    #Dbg.trace(self, :messages)
     SimpleTank.Tank.update(self)
     { :ok, tank }
   end

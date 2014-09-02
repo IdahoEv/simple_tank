@@ -17,7 +17,7 @@ defmodule SimpleTank.BulletList do
   end
 
   def init( bullet_list ) do
-    Dbg.trace(self, :messages)
+    #Dbg.trace(self, :messages)
     SimpleTank.BulletList.update(self)
     { :ok, bullet_list }
   end

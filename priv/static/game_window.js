@@ -97,6 +97,7 @@ var GameWindow = (function () {
       console.log('deleting sprite with id '+ sid);
       bullet_sprite = bullet_sprites[sid];
       bullet_sprite.kill;
+      bullet_sprite.parent.removeChild(bullet_sprite);
       delete bullet_sprites[sid];
     }
   }

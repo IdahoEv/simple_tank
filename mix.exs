@@ -14,7 +14,9 @@ defmodule SimpleTank.Mixfile do
   def application do
     [ 
       mod: { SimpleTank, []},
-      applications: [ :cowboy, :ranch, :dbg ]
+      applications: [ :cowboy, :ranch, 
+        #:dbg
+      ]
     ]
   end
 
@@ -28,9 +30,9 @@ defmodule SimpleTank.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [ { :cowboy, github: "extend/cowboy", tag: "0.10.0"  },
-      { :jsex, "~> 2.0.0" } ,
-      { :dbg, "~> 0.14.3" }
+    [ { :cowboy, "~> 1.0.0"  },
+      { :jsex, "~> 2.0.0" } #,
+      #{ :dbg, "~> 0.14.3" }
     ]
   end
 end
