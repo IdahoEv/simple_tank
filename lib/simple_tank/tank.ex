@@ -50,7 +50,6 @@ defmodule SimpleTank.Tank do
   def handle_cast(:update, tank  ) do
     cs = SimpleTank.TankControlState.update( tank.control_state )
     physics = SimpleTank.TankPhysics.update( tank.physics, cs )
-    fire(tank.control_state.trigger)
 
     #IO.puts "(Tank handle_cast) Updating tank: #{inspect(self)}, #{tank.name}"
     new_tank = %{ tank | physics: physics, control_state: cs }
