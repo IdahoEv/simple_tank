@@ -18,6 +18,9 @@ defmodule SimpleTank.TankList do
   def get_tank(tank_name) do
      GenServer.call :tank_list, { :get_tank, tank_name }
   end   
+  def get_length do
+    GenServer.call :tank_list, :get_length
+  end
 
 
   #####                     
@@ -31,6 +34,9 @@ defmodule SimpleTank.TankList do
 
   def handle_cast({:add_tank, name, tank_pid}, tank_list) do
     { :noreply, Dict.put(tank_list, name, tank_pid)}
+  end
+  def handle_call(:get_length, _from, tank_list) do
+    { :reply, length(tank_list), tank_list }
   end
 end
 
