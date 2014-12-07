@@ -15,7 +15,7 @@ defmodule WebsocketHandler do
     {:ok, json} = JSEX.decode(msg)
     {:ok, req, handle_message(state, json)}
   end
-  def websocket_handle(_rata, req, state) do    
+  def websocket_handle(_data, req, state) do    
     {:ok, req, state}
   end
   
@@ -36,7 +36,17 @@ defmodule WebsocketHandler do
     state
   end
 
+  def tank_pid(state) do
+    # TODO store associated tank pid in state, retrieve
+    self() #definitely wrong, just a placeholder
+  end
+  
+  # TODO: handle connect without player_id
+  # TODO: handle connect with player id
+  # TODO: handle control message from socket
+  # TODO: handle update message from game
 
+  # TODO: move this functionality into the Game
   def websocket_info({timeout, _ref, msg}, req, state) do
     physics = SimpleTank.Tank.get_public_state(tank_pid(state))
     bullets = SimpleTank.BulletList.get(bullet_list_pid(state))
@@ -56,13 +66,6 @@ defmodule WebsocketHandler do
     :bullet_list    
   end
   
-  def tank_pid(_state) do
-    SimpleTank.TankList.get_tank(:tank_01)
-  end
-  def tank2(_state) do
-    SimpleTank.TankList.get_tank(:tank_02)
-  end
-
   def websocket_terminate(_reason, _req, _state) do
     :ok
   end

@@ -8,13 +8,10 @@ defmodule SimpleTank.Supervisor do
   end
 
   def start_workers(sup) do
-    # TODO: move tank and bullet list into Game state, instead of separate servers
+    # TODO: move bullet list into Game state, instead of separate server
     # TODO 2: proper supervision tree with one for the game and one for the tanks
-    { :ok, tank_list } = 
-       Supervisor.start_child(sup, worker(SimpleTank.TankList, []))
     { :ok, bullet_list } = 
        Supervisor.start_child(sup, worker(SimpleTank.BulletList, []))
-
   end
 
   def init(_) do
@@ -23,16 +20,16 @@ defmodule SimpleTank.Supervisor do
 
   def add_tank(sup, number) do
     id_num = :io_lib.format("~3.10.0B", [number]) |> :erlang.list_to_binary
-    tank = _tank_spec("tank_" <> id_num, :tank_list)
+    tank = _tank_spec("tank_" <> id_num)
     { :ok, tank_pid } =  Supervisor.start_child(sup, tank)
   end
 
-  defp _tank_spec(id_num, tank_list_pid) do
+  defp _tank_spec(id_num) do
     name = :"tank_#{id_num}"
     { name,
       { SimpleTank.Tank, 
         :start_link,
-        [ {name, tank_list_pid} ]
+        [ name ]
       },
       :permanent,
       5000,

@@ -6,16 +6,14 @@ defmodule SimpleTank.Tank do
   defstruct  physics: %SimpleTank.TankPhysics{},
              control_state: %SimpleTank.TankControlState{},
              name: :"",
-             tank_list_pid: 0,
              last_fired: 0
 
 
-  def start_link({ name, tank_list_pid}) do
+  def start_link( name) do
     IO.puts "registering tank #{inspect name}"
     GenServer.start_link __MODULE__, 
       %SimpleTank.Tank{ 
-        name: name,
-        tank_list_pid: tank_list_pid
+        name: name
       },
       name: name 
   end
@@ -27,7 +25,6 @@ defmodule SimpleTank.Tank do
   def fire(pid),                  do: GenServer.cast(pid, :fire)
 
   def init( tank ) do
-    SimpleTank.TankList.add_tank(tank.tank_list_pid, tank.name, self)
     #Dbg.trace(self, :messages)
     SimpleTank.Tank.update(self)
     { :ok, tank }
@@ -54,6 +51,7 @@ defmodule SimpleTank.Tank do
     #IO.puts "(Tank handle_cast) Updating tank: #{inspect(self)}, #{tank.name}"
     new_tank = %{ tank | physics: physics, control_state: cs }
   
+    # TODO move update loop into Game, or another module entirely
     :erlang.send_after(@update_interval, self, { :"$gen_cast", :update } )
     { :noreply, new_tank }
   end
