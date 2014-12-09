@@ -8,62 +8,60 @@ defmodule WebsocketHandler do
   def websocket_init(_TransportName, req, _opts) do
     IO.puts "init.  Starting timer"
     :erlang.start_timer(500, self(), [])
-    {:ok, req, :undefined_state }
+    {:ok, req, %{} }
   end
 
   def websocket_handle({:text, msg}, req, state) do
     {:ok, json} = JSEX.decode(msg)
-    {:ok, req, handle_message(state, json)}
+    handle_message(json, req, state)
   end
+
   def websocket_handle(_data, req, state) do    
+    IO.puts "Warning, unhandled message received over socket"
     {:ok, req, state}
   end
   
-  def handle_message(state, %{ "acceleration" => a_direction, 
-                               "rotation" => r_direction,
-                               "trigger" => t_state
-                             }) do    
-    tank_pid(state) |> SimpleTank.Tank.update_controls(
-      %{ "acceleration" => a_direction,
-         "rotation" => r_direction,
-         "trigger" => t_state
-      }
-    )
-    state
+  # New player connects.
+  def handle_message(%{ "connect" => "new", "name" => player_name }, req, state) do
+    { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self())
+    { :reply, player_id_reply(player), req, %{ state | tank_pid: player.tank_pid }}
   end
-  def handle_message(state, message) do
-    IO.puts "unhandled message:  #{inspect(message)}"
+
+  # Existing player reconnects.
+  def handle_message(%{ "connect" => player_id, "name" => player_name}, req, state ) do
+    player = case  SimpleTank.Game.reconnect_player(:game, player_id, self()) do
+      { :ok, player } -> 
+        player
+      { :not_found }  -> 
+        { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self() )      
+    end
+    { :reply, player_id_reply(player), req, %{ state | tank_pid: player.tank_pid }}
+  end
+
+  def player_id_reply(player) do
+    { :ok, reply } = JSEX.encode(%{ player_id: player.player_id })
+    { :text, reply }
+  end
+
+  # Handle control message from socket.   Pass it to the tank associated in state.
+  def handle_message(%{ "controls" => control_map }, req, state) do
+    state.tank_pid |> SimpleTank.Tank.update_controls(control_map) 
     state
   end
 
-  def tank_pid(state) do
-    # TODO store associated tank pid in state, retrieve
-    self() #definitely wrong, just a placeholder
+  def handle_message(message, state) do
+    IO.puts "unhandled socket message in socket handler:  #{inspect(message)}"
+    state
   end
-  
-  # TODO: handle connect without player_id
-  # TODO: handle connect with player id
-  # TODO: handle control message from socket
-  # TODO: handle update message from game
 
-  # TODO: move this functionality into the Game
-  def websocket_info({timeout, _ref, msg}, req, state) do
-    physics = SimpleTank.Tank.get_public_state(tank_pid(state))
-    bullets = SimpleTank.BulletList.get(bullet_list_pid(state))
-    {:ok, json} = JSEX.encode(%{ 
-      player_tank_physics: physics,
-      bullet_list: bullets
-    })
-    :erlang.start_timer(50, self(), json )
+  # Send an update of the world state out to the client
+  def websocket_info({ :update, msg }, req, state) do 
     {:reply, {:text, msg}, req, state}
   end
 
   def websocket_info(_info, req, state) do
+    IO.puts "Unhandled erlang message in socket handler:  #{inspect(message)}"
     {:ok, req, state}
-  end
-
-  def bullet_list_pid(_state) do
-    :bullet_list    
   end
   
   def websocket_terminate(_reason, _req, _state) do
