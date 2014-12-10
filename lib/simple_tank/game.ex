@@ -43,7 +43,6 @@ defmodule SimpleTank.Game do
   end
 
 
-
   #Server Callbacks
   
   # add_player is a call so that down the road the game can refuse - either because

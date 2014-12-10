@@ -46,12 +46,12 @@ defmodule WebsocketHandler do
   # Handle control message from socket.   Pass it to the tank associated in state.
   def handle_message(%{ "controls" => control_map }, req, state) do
     state.tank_pid |> SimpleTank.Tank.update_controls(control_map) 
-    state
+    { :ok, req, state }
   end
 
-  def handle_message(message, state) do
+  def handle_message(message, req, state) do
     IO.puts "unhandled socket message in socket handler:  #{inspect(message)}"
-    state
+    { :ok, req, state }
   end
 
   # Send an update of the world state out to the client

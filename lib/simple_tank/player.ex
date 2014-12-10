@@ -5,12 +5,6 @@ defmodule SimpleTank.Player do
              tank_pid:      :"",
              game_pid:      :game,
              websocket_pid: :""
-              
-  # TODO: update websocket
-  
-  #def new_player_id do
-    #UUID.uuid1()
-  #end
   
 end
 
