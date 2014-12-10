@@ -7,16 +7,19 @@ defmodule TankPhysicsFacts do
 
   alias SimpleTank.TankPhysics
 
-  facts "apply_acceleration when controls are off" do    
+  def delta, do: 0.5
 
-    fact "when speed is under the minimum it should decelate to zero" do
-      TankPhysics.apply_acceleration(0.29, :off, 0.5) |>  equals 0.0 
-    end    
-    fact "when speed is not under the minimum it should slow down by the decel rate" do
-      TankPhysics.apply_acceleration(1.0, :off, 0.5) 
-        |>  roughly 1.0 - (1.0 *  0.5 * 0.75) 
-    end    
+  facts "apply_acceleration" do
+    facts "when controls are off" do    
+
+      fact "when speed is under the minimum it should decelate to zero" do
+        TankPhysics.apply_acceleration(0.29, :off, delta) |>  equals 0.0 
+      end    
+      fact "when speed is not under the minimum it should slow down by the decel rate" do
+        TankPhysics.apply_acceleration(0.31, :off, delta) 
+          |>  roughly 0.31 - (0.31 *  delta * 0.75) 
+      end    
+    end
   end
-
 end
 
