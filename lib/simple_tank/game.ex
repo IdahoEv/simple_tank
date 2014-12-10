@@ -6,22 +6,14 @@ defmodule SimpleTank.Game do
   @world_update_interval 20   # update physics & game state 50 Hz
   @client_update_interval 100 # send updates to client 10 Hz
   
-  defstruct  players: %{}  # map keyed by player_id
+  defstruct  players: %{},  # map keyed by player_id
+             last_updated: SimpleTank.Time.now,
+             bullet_list: [] 
 
   def init(_args) do
+    IO.puts "Game init called with #{inspect(_args)}"
     { :ok,  %SimpleTank.Tank{} }
   end
-
-  # get player by ID
-  #   { :ok, player_id }
-  #   { :not_found } 
-  #
-  # add new player
-  # 
-  # internal physics update
-  #
-  # send updates to all players
-  
 
 
   #Public API
@@ -30,7 +22,7 @@ defmodule SimpleTank.Game do
   # Returns
   #   { :ok, <Player> }
   def add_player(_pid, name, websocket_pid) do
-    GenServer.call @my_pid, { :add_player, player_args } 
+    GenServer.call @my_pid, { :add_player, { name, websocket_pid } } 
   end
 
   # Connect a player and new websocket to his existing tank
@@ -40,8 +32,13 @@ defmodule SimpleTank.Game do
   #   { :ok, <Player> }
   #   { :not_found }
   def reconnect_player(_pid, player_id, websocket_pid) do
-    GenServer.call @my_pid, { :reconnect_player, player_args } 
+    GenServer.call @my_pid, { :reconnect_player, { player_id, websocket_pid} } 
   end
+
+  def add_bullet(firing_tank) do
+    GenServer.cast @my_pid, { :add_bullet, firing_tank }
+  end
+
 
 
   #Server Callbacks
@@ -69,6 +66,7 @@ defmodule SimpleTank.Game do
 
   def handle_call({ :reconnect_player, { player_id, websocket_pid}, _from, state}) do
     case state.players[player_id] do
+      # connect as a new player?
       nil -> { :reply, { :not_found }, state }
       player -> 
         player = %SimpleTank.Player{ player | websocket_pid: websocket_pid }
@@ -78,32 +76,74 @@ defmodule SimpleTank.Game do
         }      
     end
   end
-
-  def handle_cast(:update_world, state) do
-    
-    :erlang.send_after(@update_world_interval, self, { :"$gen_cast", :update_world } )
-  end  
-
-  def handle_call(msg, from, state) do
+  def handle_call(msg, _from, state) do
     { :stop, "Unhandled call in Game: #{inspect(msg)}", state }
   end
+
+  def handle_cast( {:add_bullet, firing_tank}, state ) do    
+    { :noreply, 
+      %{ state | bullet_list: 
+                 SimpleTank.BulletList.add_bullet(
+                    state.bullet_list, 
+                    firing_tank.physics.position, 
+                    firing_tank.physics.rotation)
+       } 
+    }
+  end
+
   def handle_cast(msg, state) do
     { :stop, "Unhandled cast in Game: #{inspect(msg)}", state }
   end
-  def handle_info(msg, state) do
-    { :stop, "Unhandled info in Game: #{inspect(msg)}", state }
+
+
+  # The main physics / world state update loop.  This is finer-grained than
+  # the updates sent to the client, to help keep the physics smooth. The client
+  # is expected to interpolate and tween on its own
+  def handle_info( :update_world, state) do
+    # TODO: compute elapsed time once
+    
+    # queue up another update a few milliseconds from now
+    Process.send_after(self(), :update_world, @world_update_interval)
+    bullet_list = SimpleTank.BulletList.update(state.bullet_list)    
+
+    # TODO: tell every tank to update? or let tanks self-update?    
+    
+    { :noreply, %{ state | bullet_list: bullet_list}}
   end
 
-  # TODO: new version of this
-  def websocket_info({timeout, _ref, msg}, req, state) do
-    physics = SimpleTank.Tank.get_public_state(tank_pid(state))
-    bullets = SimpleTank.BulletList.get(bullet_list_pid(state))
-    {:ok, json} = JSEX.encode(%{ 
-      player_tank_physics: physics,
-      bullet_list: bullets
-    })
-    :erlang.start_timer(50, self(), json )
-    {:reply, {:text, msg}, req, state}
+  # 
+  def handle_info(:update_clients, state) do
+    Process.send_after(self(), :update_clients, @client_update_interval)
+
+    # map the player list onto physics state of each tank
+    # We get a Dict of player -> tank state 
+    tank_states = Enum.map(state.players, fn({_player_id, player}) -> 
+      {player, SimpleTank.get_public_state(player.tank_pid)} 
+    end)
+
+    public_tank_states = Enum.map(tank_states, fn({player, tank_state}) -> 
+      {player.name, tank_state} 
+    end)
+    
+    bullets = state.bullet_list 
+
+    # TODO: only do the JSON conversion of tanks and bullet list once, 
+    # for optimization.
+    Enum.each(state.players, fn({player_id, player}) ->
+      {:ok, json} = JSEX.encode(%{ 
+        player_id: player_id,
+        player_tank_physics: Dict.get(tank_states, player),             
+        bullet_list: bullets,
+        tanks: public_tank_states
+      })
+      player.websocket_id ! { :update, json } 
+    end)
+
+    { :noreply, state }
+  end
+
+  def handle_info(msg, state) do
+    { :stop, "Unhandled info in Game: #{inspect(msg)}", state }
   end
 end
 

@@ -3,19 +3,21 @@ defmodule SimpleTank.Supervisor do
 
   def start_link(_) do
     result = {:ok, sup} = Supervisor.start_link(__MODULE__, [], name: :supervisor)
-    start_workers(sup)
     result
   end
 
-  def start_workers(sup) do
-    # TODO: move bullet list into Game state, instead of separate server
-    # TODO 2: proper supervision tree with one for the game and one for the tanks
-    { :ok, bullet_list } = 
-       Supervisor.start_child(sup, worker(SimpleTank.BulletList, []))
-  end
+  #def start_workers(sup) do
+    ## TODO: move bullet list into Game state, instead of separate server
+    ## TODO 2: proper supervision tree with one for the game and one for the tanks
+    #{ :ok, bullet_list } = 
+       #Supervisor.start_child(sup, worker(SimpleTank.BulletList, []))
+  #end
 
   def init(_) do
-    supervise [], strategy: :one_for_one
+    children = [
+      worker(SimpleTank.Game, [])
+    ]
+    supervise(children, strategy: :one_for_one)
   end
 
   def add_tank(sup, number) do

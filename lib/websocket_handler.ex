@@ -1,7 +1,7 @@
 defmodule WebsocketHandler do
   @behaviour :cowboy_websocket_handler
 
-  def init({tcp, http}, _req, _opts) do
+  def init({_tcp, _http}, _req, _opts) do
     {:upgrade, :protocol, :cowboy_websocket}
   end
 
@@ -59,7 +59,7 @@ defmodule WebsocketHandler do
     {:reply, {:text, msg}, req, state}
   end
 
-  def websocket_info(_info, req, state) do
+  def websocket_info(message, req, state) do
     IO.puts "Unhandled erlang message in socket handler:  #{inspect(message)}"
     {:ok, req, state}
   end

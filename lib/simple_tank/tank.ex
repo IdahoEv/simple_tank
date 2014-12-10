@@ -22,7 +22,9 @@ defmodule SimpleTank.Tank do
   def update_controls(pid, cmd),  do: GenServer.cast(pid, { :update_controls, cmd })
   def update(pid),                do: GenServer.cast(pid, :update)
   def get_public_state(pid),      do: GenServer.call(pid, :get_public_state)
-  def fire(pid),                  do: GenServer.cast(pid, :fire)
+  def fire(pid) do
+    GenServer.cast(pid, :fire)
+  end
 
   def init( tank ) do
     #Dbg.trace(self, :messages)
@@ -39,8 +41,9 @@ defmodule SimpleTank.Tank do
     new_tank = %{ tank | control_state: SimpleTank.TankControlState.update_controls(tank.control_state, controls, self) }   
     { :noreply, new_tank }
   end
+
   def handle_cast( :fire, tank) do
-    SimpleTank.BulletList.add_bullet(tank.physics.position, tank.physics.rotation)
+    SimpleTank.Game.add_bullet(tank)
     { :noreply, %{ tank | last_fired: SimpleTank.Time.now } }
   end
 
