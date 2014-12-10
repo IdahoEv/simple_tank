@@ -32,7 +32,8 @@ defmodule SimpleTank.Mixfile do
   defp deps do
     [ { :cowboy, "~> 1.0.0"  },
       { :jsex, "~> 2.0.0" }, 
-      { :uuid, "~> 0.1.5" }
+      { :uuid, "~> 0.1.5" },
+      { :amrita, "~> 0.4", github: "josephwilk/amrita" }
       #{ :dbg, "~> 0.14.3" }
     ]
   end

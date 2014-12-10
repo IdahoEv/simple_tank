@@ -1,8 +1,10 @@
-%{"cowboy": {:package, "1.0.0"},
-  "cowlib": {:package, "1.0.0"},
-  "dbg": {:package, "0.14.3"},
-  "jsex": {:package, "2.0.0"},
+%{"amrita": {:git, "git://github.com/josephwilk/amrita.git", "bc28aeb2c773a71808dd814a9390758da1af744c", []},
+  "cowboy": {:hex, :cowboy, "1.0.0"},
+  "cowlib": {:hex, :cowlib, "1.0.0"},
+  "dbg": {:hex, :dbg, "0.14.3"},
+  "jsex": {:hex, :jsex, "2.0.0"},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
-  "jsx": {:package, "2.0.4"},
-  "ranch": {:package, "1.0.0"},
-  "uuid": {:package, "0.1.5"}}
+  "jsx": {:hex, :jsx, "2.0.4"},
+  "meck": {:git, "git://github.com/eproxus/meck.git", "fd1c79361d4a5fa16774c8b378dd89104d3dfaa5", [branch: "master"]},
+  "ranch": {:hex, :ranch, "1.0.0"},
+  "uuid": {:hex, :uuid, "0.1.5"}}
