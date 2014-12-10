@@ -10,12 +10,15 @@ defmodule SimpleTank.Game do
              last_updated: SimpleTank.Time.now,
              bullet_list: [] 
 
-  def init(_args) do
-    IO.puts "Game init called with #{inspect(_args)}"
-    { :ok,  %SimpleTank.Tank{} }
+
+  def start_link() do
+    IO.puts "registering game server"
+    GenServer.start_link __MODULE__, 
+      %SimpleTank.Game{},
+      name: @my_pid
   end
 
-
+             
   #Public API
   
   # Make a new tank and associate a player connection to it.
@@ -47,6 +50,11 @@ defmodule SimpleTank.Game do
   # it's too late, or there are too many players, or the game is over.
   #
   # For now, just push a new player onto the state
+  def init(_args) do
+    IO.puts "Game init called with #{inspect(_args)}"
+    { :ok,  %SimpleTank.Tank{} }
+  end
+
   def handle_call({ :add_player, { name, websocket_pid }, _from, state}) do
     {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(
       :supervisor, 
