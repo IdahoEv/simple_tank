@@ -14,28 +14,11 @@ var SocketHandler = (function(){
       //$('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
       connect();
     };
-    $("#connected").hide(); 	
-    $("#messages").hide(); 	
-    $("#connect_button").click(function(){
-      connect_to_game();
-    });
   };
   my.transmit = function(object) {
     sendJSON(object);
   }
-
-  // Private methods
-  function connect() {
-    //wsHost = $("#server").val()
-    websocket = new WebSocket(wsHost);
-    showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
-    websocket.onopen = function(evt) { onOpen(evt) }; 
-    websocket.onclose = function(evt) { onClose(evt) }; 
-    websocket.onmessage = function(evt) { onMessage(evt) }; 
-    websocket.onerror = function(evt) { onError(evt) }; 
-  };  
-
-  function connect_to_game() {   
+  my.connect_to_game = function() {   
     if(!websocket.readyState == websocket.OPEN) {
       connect();
     }
@@ -45,6 +28,17 @@ var SocketHandler = (function(){
     }
     sendJSON(message);    
   };
+
+  // Private methods
+  function connect() {
+    //wsHost = $("#server").val()
+    websocket = new WebSocket(wsHost);
+    websocket.onopen = function(evt) { onOpen(evt) }; 
+    websocket.onclose = function(evt) { onClose(evt) }; 
+    websocket.onmessage = function(evt) { onMessage(evt) }; 
+    websocket.onerror = function(evt) { onError(evt) }; 
+    ExternalUX.socket_connected();
+  };  
 
 
   function disconnect() {
@@ -63,23 +57,21 @@ var SocketHandler = (function(){
     if(websocket.readyState == websocket.OPEN){
       string_message = JSON.stringify(message);
       websocket.send(string_message);
-      showScreen(string_message); 
+      ExternalUX.message_sent(message);
     } else {
-      showScreen('websocket is not connected'); 
+      ExternalUX.socket_disconnected();
     };
   };
 
   function onOpen(evt) { 
-    showScreen('<span style="color: green;">CONNECTED </span>'); 
-    $("#connected").fadeIn('slow');
-    $("#messages").fadeIn('slow');
+    ExternalUX.socket_connected();
   };  
 
   function onClose(evt) { 
-    showScreen('<span style="color: red;">DISCONNECTED </span>');
+    ExternalUX.socket_disconnected();
   };  
 
-  function updateTankState(tank_state) {
+  function updateTankState(tank_state) {  
     var x = tank_state.position.x;
     var y = tank_state.position.y;
     $('#position').html( "(" + Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) +") "
@@ -99,13 +91,14 @@ var SocketHandler = (function(){
     //console.log(evt.data);
     //try {
       message = JSON.parse(evt.data);
+      ExternalUX.message_received(evt.data);
       if ( message.player_tank_physics !== undefined) {
         updateTankState(message["player_tank_physics"]);
         updateBulletList(message["bullet_list"]);
       }
-      else {
-        showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
-      }
+      //else {
+        //showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
+      //}
     //} catch(err) {
       //console.log(err); 
       //console.log("Could not JSON parse event message: "+evt.data)
@@ -113,17 +106,9 @@ var SocketHandler = (function(){
   };  
 
   function onError(evt) {
-    if (evt.data !== undefined) {
-      showScreen('<span style="color: red;">ERROR: ' + evt.data + '</span>');
-    } else {
-      showScreen('<span style="color: red;">UNKNOWN ERROR: ' + evt + '</span>');
-    }
-
+    ExternalUX.error(evt);
   };
 
-  function showScreen(txt) { 
-    $('#output').prepend('<p>' + txt + '</p>');
-  };
 
   function clearScreen() 
   { 

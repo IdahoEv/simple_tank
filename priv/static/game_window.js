@@ -1,6 +1,5 @@
 var GameWindow = (function () {
 
-
   var my = {},
     game,
     key_handler,
@@ -8,8 +7,8 @@ var GameWindow = (function () {
     bullet_list = [],
     bullet_sprites = {},
     sprite,
-    default_width = 500,
-    default_height = 500,
+    default_width = 600,
+    default_height = 600,
     scale = 32;   // pixels per unit size. Tank height/width is 1.0 unit size.
 
   var imageObj = new Image();

@@ -10,6 +10,7 @@
     <!--<script src="/static/phaser/gamecontroller.js" type="text/javascript"></script>-->
     <!--<script src="/static/phaser/phaser-viewer.js" type="text/javascript"></script>-->
 
+    <script src="/static/external_ux.js"></script>
     <script src="/static/game_window.js"></script>
     <script src="/static/key_handler.js"></script>
     <script src="/static/socket_handler.js"></script>
@@ -20,13 +21,10 @@
     <div id="header" class='clearfix'>
       <h1>Tankity Tank</h1>
       <div id="status">
-        <div class='section'>
-          Socket Messages: <span id='message_count'></span>          
-        </div>
-        <div class='section'>
-          Frames: <span id='frame_count'></span>
+        <div class='connection'>
         </div>
       </div>
+
       <p id="connecting">
 	<!--<input type='text' id="server" value=""></input>-->
 	<input type='text' id="player_name" value="Xadism" placeholder='Name'></input>
@@ -34,22 +32,51 @@
       </p>      
     </div>
 
-    <div id="navigation">
-
-      <div id="connected">				
-         <div id="position"></div>       
+    <div id="content">
+      <div id="status_bar">				
+        <div class='section'>
+          <table>
+            <caption>Tank State</caption>
+            <tr><th>Coords</th><td id='tank_coords'></td>
+            <tr><th>Velocity</th><td id='tank_velocity'></td>
+          </table>
+        </div>
+        <div class='section'>
+          <table>
+            <caption>Game Info</caption>
+            <tr><th># Tanks</th><td id='tank_count'></td>
+            <tr><th># Bullets</th><td id='bullet_count'></td>
+          </table>
+        </div>       
+        <div class='section'>
+          <table>
+            <caption>Communication Stats</caption>
+            <tr><th>Messages Rcvd</th><td id='rcvd_message_count'></td>
+            <tr><th>Messages Sent</th><td id='sent_message_count'></td>
+            <tr><th>Frames Rendered</th><td id='frames_rendered'></td>
+          </table>
+        </div>
+        <div class='section' id='status_messages'>
+          <h3>Status Messages</h3>
+          <div class='message_container'></div>         
+        </div>
       </div>
      
-
-      <div id='content'>
-        <div id="messages">
-          <h3>Socket Messages:</h3>
-          <div id="output"></div>
-        </div>
+      <div id='field'>
         <div id="gameField">
         </div>
       </div>
+    </div>
 
+    <div id='debugging_info' class='clearfix'>
+      <div id='sent_messages'>
+         <h3>Sent Messages</h3>
+         <div class='message_container'></div>
+      </div>
+      <div id='received_messages'>
+         <h3>Received Messages</h3>
+         <div class='message_container'></div>
+      </div>
     </div>
   </body>
 </html> 

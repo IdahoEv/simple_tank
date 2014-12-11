@@ -118,7 +118,7 @@ defmodule SimpleTank.Game do
 
   # 
   def handle_info(:update_clients, state) do
-    IO.puts("Updating #{Dict.size(state.players)} clients") 
+    #IO.puts("Updating #{Dict.size(state.players)} clients") 
     Process.send_after(self(), :update_clients, @client_update_interval)
 
     # map the player list onto physics state of each tank
@@ -130,7 +130,7 @@ defmodule SimpleTank.Game do
       {player, SimpleTank.Tank.get_public_state(player.tank_pid)} 
     end)
 
-    IO.puts "Tank states: #{inspect(tank_states)}"
+    #IO.puts "Tank states: #{inspect(tank_states)}"
 
     # This makes the public-safe list of all tank states, keyed by name
     # instead of player.  It's done as a second step so that tank_states

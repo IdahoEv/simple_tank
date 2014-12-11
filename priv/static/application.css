@@ -4,15 +4,17 @@ body {
   padding: 0;
   margin: 0;
 }
-#messages {
+#status_bar {
   width: 200px;
   float: left;
-  height: 100%;
+  padding: 10px;
+  height: 580px;
 }
 #field {
   margin-left: 200px;
   border-left: 1px black solid;
-  min-height: 1000px;
+  height: 600px;
+  width: 700px;
 }
 #header h1 {
   float: left;
@@ -29,6 +31,7 @@ body {
 }
 #content {
   border-top: 1px solid black;
+  height: 600px;
 }
 #messages p {
   margin: 0.25em 1em;
@@ -40,6 +43,44 @@ body {
 }
 #gameCanvas:focus {
   outline: 0;
+}
+
+#sent_messages {
+  width: 45%;
+  float: left;
+}
+#received_messages {
+  width: 45%;
+  float: right; 
+}
+#debugging_info {
+  border-top: 1px black solid
+}
+
+table, th, td, caption {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+td, th {
+  padding: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+table caption {
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+  background: #bbb;
+  padding: 8px;
+}
+#status_bar table {
+  width: 178px;
+}
+#status_bar th {
+  font-size: 10px;
+  font-weight: normal;
+  width: 60%;
+  text-align: left;
 }
 
 .clearfix:after {
