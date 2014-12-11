@@ -55,13 +55,11 @@ defmodule SimpleTank.Game do
   end
 
   def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do
-    IO.puts("In add player call handler, state is #{inspect(state)}")
-    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(
-      :supervisor, 
-      Dict.size(state.players) + 1  
-    ) # TODO - clean up when I build a better supervision tree
+    #IO.puts("In add player call handler, state is #{inspect(state)}")
+    player  = SimpleTank.Player.new(name, websocket_pid)
+    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player.player_id)
+    player  = %SimpleTank.Player{ player | tank_pid: tank_pid} 
 
-    player   = SimpleTank.Player.new(name, tank_pid, websocket_pid)
     { :reply,      
       { :ok, player }, 
       %{ state | players: Dict.put(state.players, player.player_id, player) }

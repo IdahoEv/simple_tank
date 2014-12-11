@@ -23,16 +23,9 @@ defmodule WebsocketHandler do
   
   # New player connects.
   def handle_message(%{ "connect" => "new", "name" => player_name }, req, state) do
-    IO.puts "--------------- ADDING PLAYER -------------------"
-    IO.puts "websocket handler pid is #{inspect(self())}"
     { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self())
-    IO.puts "returned player is #{inspect(player)}\n\n"
-    { :ok, reply } = JSEX.encode(%{ player_id: player.player_id })
-    IO.puts "prepared reply is #{inspect(reply)}\n\n"
-    IO.puts "--------------- FINISHED ADDING PLAYER -------------------"
-    {:reply, { :text, reply }, req, state }
-
-    #{ :reply, player_id_reply(player), req, %{ state | tank_pid: player.tank_pid }}
+    #{ :ok, reply } = JSEX.encode(%{ player_id: player.player_id })
+    {:reply, player_id_reply(player), req, state }
   end
 
   # Existing player reconnects.

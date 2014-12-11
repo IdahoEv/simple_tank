@@ -9,13 +9,9 @@ defmodule SimpleTank.Tank do
              last_fired: 0
 
 
-  def start_link( name) do
-    IO.puts "registering tank #{inspect name}"
-    GenServer.start_link __MODULE__, 
-      %SimpleTank.Tank{ 
-        name: name
-      },
-      name: name 
+  def start_link(name) do
+    IO.puts "registering tank #{inspect(name)}"
+    GenServer.start_link __MODULE__, %SimpleTank.Tank{ name: name }
   end
 
   # Public API
