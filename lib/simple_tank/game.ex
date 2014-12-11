@@ -51,6 +51,8 @@ defmodule SimpleTank.Game do
   # For now, just push a new player onto the state
   def init(_args) do
     IO.puts "Game init called with #{inspect(_args)}"
+    Process.send_after(self(), :update_world,   @world_update_interval)
+    Process.send_after(self(), :update_clients, @client_update_interval)
     { :ok,  %SimpleTank.Game{} }
   end
 
@@ -102,7 +104,8 @@ defmodule SimpleTank.Game do
   # the updates sent to the client, to help keep the physics smooth. The client
   # is expected to interpolate and tween on its own
   def handle_info( :update_world, state) do
-    # TODO: compute elapsed time once
+    # TODO: compute elapsed time, use a single delta for all upates
+    #IO.puts("Updating world") 
     
     # queue up another update a few milliseconds from now
     Process.send_after(self(), :update_world, @world_update_interval)
@@ -115,6 +118,7 @@ defmodule SimpleTank.Game do
 
   # 
   def handle_info(:update_clients, state) do
+    IO.puts("Updating #{Dict.size(state.players)} clients") 
     Process.send_after(self(), :update_clients, @client_update_interval)
 
     # map the player list onto physics state of each tank
@@ -122,15 +126,17 @@ defmodule SimpleTank.Game do
     # Player struct, which is not public information. This will
     # not be directly returned to any player, but is used to construct
     # the items that will be.    
-    tank_states = Enum.map(state.players, fn({_player_id, player}) -> 
+    tank_states = Enum.into(state.players, %{}, fn({_player_id, player}) -> 
       {player, SimpleTank.Tank.get_public_state(player.tank_pid)} 
     end)
+
+    IO.puts "Tank states: #{inspect(tank_states)}"
 
     # This makes the public-safe list of all tank states, keyed by name
     # instead of player.  It's done as a second step so that tank_states
     # can still be used as a fast way of pulling the current player's 
     # private state, without having to fetch it from the Tank server again. 
-    public_tank_states = Enum.map(tank_states, fn({player, tank_state}) -> 
+    public_tank_states = Enum.into(tank_states, %{}, fn({player, tank_state}) -> 
       {player.name, tank_state} 
     end)
     
@@ -141,11 +147,11 @@ defmodule SimpleTank.Game do
     Enum.each(state.players, fn({player_id, player}) ->
       {:ok, json} = JSEX.encode(%{ 
         player_id: player_id,
-        player_tank_physics: Dict.get(tank_states, player),             
+        player_tank_physics: Dict.get(tank_states, player, nil),             
         bullet_list: bullets,
         tanks: public_tank_states
       })
-      player.websocket_id ! { :update, json } 
+      send player.websocket_pid, { :update, json } 
     end)
 
     { :noreply, state }
