@@ -2,10 +2,11 @@ var SocketHandler = (function(){
   var my = {},
     websocket,
     messages = 0,
-    moveScale = 0.5;
+    moveScale = 0.5,
+    wsHost = '';
 
   my.init = function() {
-    $('#server').val("ws://" + window.location.host + "/websocket");
+    wsHost = "ws://" + window.location.host + "/websocket";
     if(!("WebSocket" in window)){  
       $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
       $("#navigation").hide();  
@@ -15,6 +16,9 @@ var SocketHandler = (function(){
     };
     $("#connected").hide(); 	
     $("#messages").hide(); 	
+    $("#connect_button").click(function(){
+      connect_to_game();
+    });
   };
   my.transmit = function(object) {
     sendJSON(object);
@@ -22,7 +26,7 @@ var SocketHandler = (function(){
 
   // Private methods
   function connect() {
-    wsHost = $("#server").val()
+    //wsHost = $("#server").val()
     websocket = new WebSocket(wsHost);
     showScreen('<b>Connecting to: ' +  wsHost + '</b>'); 
     websocket.onopen = function(evt) { onOpen(evt) }; 
@@ -30,6 +34,18 @@ var SocketHandler = (function(){
     websocket.onmessage = function(evt) { onMessage(evt) }; 
     websocket.onerror = function(evt) { onError(evt) }; 
   };  
+
+  function connect_to_game() {   
+    if(!websocket.readyState == websocket.OPEN) {
+      connect();
+    }
+    message = { 
+      connect: 'new',
+      name: $('#player_name').val()
+    }
+    sendJSON(message);    
+  };
+
 
   function disconnect() {
     websocket.close();

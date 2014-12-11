@@ -51,27 +51,24 @@ defmodule SimpleTank.Game do
   # For now, just push a new player onto the state
   def init(_args) do
     IO.puts "Game init called with #{inspect(_args)}"
-    { :ok,  %SimpleTank.Tank{} }
+    { :ok,  %SimpleTank.Game{} }
   end
 
-  def handle_call({ :add_player, { name, websocket_pid }, _from, state}) do
+  def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do
+    IO.puts("In add player call handler, state is #{inspect(state)}")
     {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(
       :supervisor, 
-      length(state.players) + 1  
+      Dict.size(state.players) + 1  
     ) # TODO - clean up when I build a better supervision tree
 
-    player   = %SimpleTank.Player{
-      name: name,
-      tank_pid: tank_pid,
-      websocket_pid: websocket_pid
-    }
+    player   = SimpleTank.Player.new(name, tank_pid, websocket_pid)
     { :reply,      
       { :ok, player }, 
       %{ state | players: Dict.put(state.players, player.player_id, player) }
     }
   end
 
-  def handle_call({ :reconnect_player, { player_id, websocket_pid}, _from, state}) do
+  def handle_call({ :reconnect_player, { player_id, websocket_pid}}, _from, state) do
     case state.players[player_id] do
       # connect as a new player?
       nil -> { :reply, { :not_found }, state }
@@ -123,11 +120,18 @@ defmodule SimpleTank.Game do
     Process.send_after(self(), :update_clients, @client_update_interval)
 
     # map the player list onto physics state of each tank
-    # We get a Dict of player -> tank state 
+    # We get a Dict of player -> tank state.  This is keyed by
+    # Player struct, which is not public information. This will
+    # not be directly returned to any player, but is used to construct
+    # the items that will be.    
     tank_states = Enum.map(state.players, fn({_player_id, player}) -> 
-      {player, SimpleTank.get_public_state(player.tank_pid)} 
+      {player, SimpleTank.Tank.get_public_state(player.tank_pid)} 
     end)
 
+    # This makes the public-safe list of all tank states, keyed by name
+    # instead of player.  It's done as a second step so that tank_states
+    # can still be used as a fast way of pulling the current player's 
+    # private state, without having to fetch it from the Tank server again. 
     public_tank_states = Enum.map(tank_states, fn({player, tank_state}) -> 
       {player.name, tank_state} 
     end)
