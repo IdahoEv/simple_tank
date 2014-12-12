@@ -50,7 +50,9 @@ defmodule SimpleTank.Tank do
     #IO.puts "(Tank handle_cast) Updating tank: #{inspect(self)}, #{tank.name}"
     new_tank = %{ tank | physics: physics, control_state: cs }
     
- 
+    # TODO - maybe? Instead of have the tank update itself, send a message from
+    # the main game update look. mrrr.... dunno. 
+    :erlang.send_after(@update_interval, self, { :"$gen_cast", :update } )
     { :noreply, new_tank }
   end
 

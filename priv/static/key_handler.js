@@ -27,7 +27,7 @@ var KeyHandler = (function(){
   }
 
   function transmit() {
-    SocketHandler.transmit(control_state);
+    SocketHandler.transmit({ controls: control_state});
 
     // every 600ms, re-transmit state to the server to prevent unintentional decay
     clearTimeout(timeout_loop);
