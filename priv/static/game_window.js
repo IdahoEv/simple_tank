@@ -24,6 +24,7 @@ var GameWindow = (function () {
     game.stage.backgroundColor = "90fa60";
     //game.physics.startSystem(Phaser.Physics.ARCADE);
     sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
+    //game.physics.
 
     sprite.anchor.setTo('0.5', '0.5');
     //game.physics.enable(sprite, Phaser.Physics.ARCADE);
