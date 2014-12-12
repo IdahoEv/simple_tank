@@ -79,12 +79,14 @@ var SocketHandler = (function(){
         + " rotation: " + Number(tank_state.rotation.toFixed(2))
         );
     //console.log("Drawing tank at: "+x+ ", "+y);
-    GameWindow.update_tank(tank_state);
+    GameWindow.update_tank_state(tank_state);
+    ExternalUX.update_tank_state(tank_state);
     messages++;
     $('#message_count').html(messages);
   }
   function updateBulletList(bullet_list) {
     GameWindow.update_bullet_list(bullet_list);
+    ExternalUX.update_bullet_list(bullet_list);
   }
 
   function onMessage(evt) { 

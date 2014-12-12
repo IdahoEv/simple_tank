@@ -123,7 +123,7 @@ var GameWindow = (function () {
 
   }
 
-  my.update_tank = function(new_tank_state) {
+  my.update_tank_state = function(new_tank_state) {
     tank_state = new_tank_state;
   }
   

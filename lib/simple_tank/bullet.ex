@@ -7,7 +7,7 @@ defmodule SimpleTank.Bullet do
             angle: 0
 
   @speed    10.0  # units/sec
-  @lifetime 1.0   # sec
+  @lifetime 2.0   # sec
 
   def new(position, angle) do
     now = SimpleTank.Time.now

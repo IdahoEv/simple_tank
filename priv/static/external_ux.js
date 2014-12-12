@@ -18,6 +18,14 @@ var ExternalUX = (function () {
   my.socket_disconnected = function() {
     $('#connection').html('<span style="color: red;">NOT CONNECTED </span>'); 
   }
+  my.update_bullet_list = function(bullet_list) {
+    $('#bullet_count').html(bullet_list.length); 
+  }
+  my.update_tank_state = function(tank_state) {
+    $('#tank_coords').html(round(tank_state.position.x) + ", " + round(tank_state.position.y)); 
+    $('#tank_speed').html(round(tank_state.speed)); 
+    $('#tank_orientation').html(round(tank_state.rotation)); 
+  }
   my.message_sent = function(message) {
     messages_sent++;
     displayMessage('#sent_messages', message);
@@ -52,6 +60,9 @@ var ExternalUX = (function () {
     $(destination + " .message_container").prepend(formatMessage(msg));
   }
 
+  function round(num) {
+    return Math.round(num * 100) / 100
+  }
   return my
 }());
 

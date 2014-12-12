@@ -65,6 +65,7 @@ td, th {
   padding: 4px;
   white-space: nowrap;
   overflow: hidden;
+  font-size: 10px;
 }
 table caption {
   font-size: 11px;
