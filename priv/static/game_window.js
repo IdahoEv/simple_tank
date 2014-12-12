@@ -22,12 +22,11 @@ var GameWindow = (function () {
     //game.world.scale = new Phaser.Point(0.5,0.5);
     
     game.stage.backgroundColor = "90fa60";
-    //game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.physics.startSystem(Phaser.Physics.ARCADE);
     sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
-    //game.physics.
+    game.physics.arcade.enable(sprite);
 
     sprite.anchor.setTo('0.5', '0.5');
-    //game.physics.enable(sprite, Phaser.Physics.ARCADE);
     //sprite.body.allowRotation = false;
 
     keys = [[ "UP",    KeyHandler.keyUpDown,    KeyHandler.keyUpUp ],
@@ -103,11 +102,10 @@ var GameWindow = (function () {
   }
 
   function update() {
+    console.log("Phaser update")
     //console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
-    sprite.x = game.world.centerX + (scale*tank_state.position.x);
-    sprite.y = game.world.centerY + (scale*tank_state.position.y);
-    sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
-    updateBullets();
+
+    //updateBullets();
   }
 
   my.init = function(kh) {
@@ -124,9 +122,22 @@ var GameWindow = (function () {
 
   }
 
+
   my.update_tank_state = function(new_tank_state) {
+    console.log("UTS")
     tank_state = new_tank_state;
+    //sprite.x = game.world.centerX + (scale*tank_state.position.x);
+    //sprite.y = game.world.centerY + (scale*tank_state.position.y);    
+    //sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
+
+    sprite.body.x = game.world.centerX + (scale*tank_state.position.x);
+    sprite.body.y = game.world.centerY + (scale*tank_state.position.y);    
+    sprite.body.velocity.x = Math.cos(sprite.angle) * tank_state.speed;
+    sprite.body.velocity.y = Math.sin(sprite.angle) * tank_state.speed;
   }
+
+
+  
   
   my.update_bullet_list = function(new_bullet_list) {
     bullet_list = new_bullet_list;

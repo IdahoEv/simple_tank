@@ -4,7 +4,7 @@ defmodule SimpleTank.Game do
   @my_pid :game
 
   @world_update_interval 20   # update physics & game state 50 Hz
-  @client_update_interval 40 # send updates to client 10 Hz
+  @client_update_interval 200 # update period to client
   
   defstruct  players: %{},  # map keyed by player_id
              last_updated: SimpleTank.Time.now,
