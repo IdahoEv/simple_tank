@@ -69,7 +69,6 @@ var SocketHandler = (function(){
     ExternalUX.socket_disconnected();
   };  
 
-
   function onMessage(evt) { 
     message = JSON.parse(evt.data);
     ExternalUX.message_received(evt.data);

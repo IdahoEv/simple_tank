@@ -19,16 +19,8 @@ var GameWindow = (function () {
   }
  
   function create() {
-    //game.world.scale = new Phaser.Point(0.5,0.5);
-    
     game.stage.backgroundColor = "90fa60";
     game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
-    game.physics.enable(tank, Phaser.Physics.ARCADE);
-    tank.anchor.setTo('0.5', '0.5');
-
-    //sprite.body.allowRotation = false;
 
     keys = [[ "UP",    KeyHandler.keyUpDown,    KeyHandler.keyUpUp ],
             [ "DOWN",  KeyHandler.keyDownDown,  KeyHandler.keyDownUp ],
@@ -42,11 +34,8 @@ var GameWindow = (function () {
       key.onDown.add(keys[i][1]);
       key.onUp.add(keys[i][2]);
     }
-    //for (var bn = 0; bn < 31; bn ++) {
-      //bullet_sprites[bn] =  game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
-      //bullet_sprites[bn].anchor.setTo('0.5', '0.5');
-    //}
   }
+
 
   function makeBulletSprite(bullet) {
     var bullet_sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
@@ -111,14 +100,19 @@ var GameWindow = (function () {
   }
 
   function update() {
-    console.log(ExternalUX.round(tank.rotation),
-        ExternalUX.round(tank.angle),
-        ExternalUX.round(tank.angularVelocity),
-        coordPairString(tank),
-        coordPairString(tank.body) ,
-        coordPairString(tank.body.velocity));
+    //tankStateDebug();
   }
 
+  function tankStateDebug() {
+    if(tank != undefined) {
+      console.log(ExternalUX.round(tank.rotation),
+          ExternalUX.round(tank.angle),
+          ExternalUX.round(tank.angularVelocity),
+          coordPairString(tank),
+          coordPairString(tank.body) ,
+          coordPairString(tank.body.velocity));
+    }
+  }
 
   my.init = function(kh) {
     key_handler = kh;
@@ -134,8 +128,16 @@ var GameWindow = (function () {
 
   }
 
+  function addPlayerTank() {
+    tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
+    game.physics.enable(tank, Phaser.Physics.ARCADE);
+    tank.anchor.setTo('0.5', '0.5');
+  }
 
   my.update_tank_state = function(tank_state) {
+    if (tank == undefined) {
+      addPlayerTank();
+    }
     tank.body.reset( game.world.centerX + (scale*tank_state.position.x),
                      game.world.centerY + (scale*tank_state.position.y) 
                     );    
@@ -146,6 +148,20 @@ var GameWindow = (function () {
         tank_state.speed * scale,
         tank.body.velocity
      );
+  }
+
+  // A cheat to improve the smoothness of apparent steering, remove the
+  // "drifty" effect of server lag.
+  my.update_UI_steering = function(direction) {
+    if (tank == undefined) {
+      if (direction == 'left') {
+        tank.body.angularVelocity = tank_state.angular_velocity * -360 / Math.PI ;
+      } else if (direction == 'right') {
+        tank.body.angularVelocity = tank_state.angular_velocity * 360 / Math.PI ;
+      } else {
+        tank.body.angularVelocity = 0.0
+      }   
+    }   
   }
 
 

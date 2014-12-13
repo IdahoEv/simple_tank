@@ -11,12 +11,12 @@ var KeyHandler = (function(){
   my.keyUpDown    = function() { updateState("acceleration", "forward") } 
   my.keyDownUp    = function() { updateState("acceleration", "off") } 
   my.keyDownDown  = function() { updateState("acceleration", "reverse") } 
+  my.keyFireUp    = function() { updateState("trigger", "off") } 
+  my.keyFireDown  = function() { updateState("trigger", "on") } 
   my.keyLeftUp    = function() { updateState("rotation", "off") } 
   my.keyLeftDown  = function() { updateState("rotation", "left") } 
   my.keyRightUp   = function() { updateState("rotation", "off") } 
   my.keyRightDown = function() { updateState("rotation", "right") } 
-  my.keyFireUp    = function() { updateState("trigger", "off") } 
-  my.keyFireDown  = function() { updateState("trigger", "on") } 
   
   function updateState(control, state) { 
     //console.log('updateState called');
@@ -24,6 +24,7 @@ var KeyHandler = (function(){
       control_state[control] = state;
       transmit();
     }
+    if (control == "rotation") { GameWindow.update_UI_steering(state) }    
   }
 
   function transmit() {
