@@ -113,6 +113,7 @@ var GameWindow = (function () {
   function update() {
     console.log(ExternalUX.round(tank.rotation),
         ExternalUX.round(tank.angle),
+        ExternalUX.round(tank.angularVelocity),
         coordPairString(tank),
         coordPairString(tank.body) ,
         coordPairString(tank.body.velocity));
@@ -138,7 +139,8 @@ var GameWindow = (function () {
     tank.body.reset( game.world.centerX + (scale*tank_state.position.x),
                      game.world.centerY + (scale*tank_state.position.y) 
                     );    
-    tank.rotation = tank_state.rotation;
+    tank.body.rotation = tank_state.rotation;
+    tank.body.angularVelocity = tank_state.angular_velocity * -180 / Math.PI ;
     game.physics.arcade.velocityFromRotation(
         tank.rotation, 
         tank_state.speed * scale,

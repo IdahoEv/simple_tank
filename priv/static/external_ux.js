@@ -32,7 +32,8 @@ var ExternalUX = (function () {
         + ", " 
         + my.round(tank_state.position.y)); 
     $('#tank_speed').html(my.round(tank_state.speed)); 
-    $('#tank_orientation').html(my.round(tank_state.rotation)); 
+    $('#tank_rotation').html(my.round(tank_state.rotation)); 
+    $('#tank_angular_velocity').html(my.round(tank_state.angular_velocity)); 
   }
   my.message_sent = function(message) {
     messages_sent++;
@@ -64,8 +65,12 @@ var ExternalUX = (function () {
   function formatMessage(message) {
     return "<p class='message'>" + message + "</p>";
   }
-  function displayMessage(destination,msg) {
+  function displayMessage(destination, msg, limit) {
+    if (typeof limit === 'undefined' ){
+      limit = 60;
+    }
     $(destination + " .message_container").prepend(formatMessage(msg));
+    $(destination + " .message_container .message").slice(limit).remove();
   }
 
   my.round = function(num) {

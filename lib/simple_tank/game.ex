@@ -150,12 +150,12 @@ defmodule SimpleTank.Game do
     # TODO: only do the JSON conversion of tanks and bullet list once, 
     # for optimization.
     Enum.each(state.players, fn({player_id, player}) ->
-      {:ok, json} = JSEX.encode(%{ 
+      {:ok, json} = JSEX.encode(%{ state_update: %{ 
         player_id: player_id,
         player_tank_physics: Dict.get(tank_states, player, nil),             
         bullet_list: bullets,
         tanks: public_tank_states
-      })
+      }})
       send player.websocket_pid, { :update, json } 
     end)
 

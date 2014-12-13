@@ -1,8 +1,6 @@
 var SocketHandler = (function(){
   var my = {},
     websocket,
-    messages = 0,
-    moveScale = 0.5,
     wsHost = '';
 
   my.init = function() {
@@ -11,7 +9,6 @@ var SocketHandler = (function(){
     ExternalUX.game_disconnected();
     if(!("WebSocket" in window)){  
       $('#connection').html('<span style="color: red;">websockets are not supported </span>');
-      $("#navigation").hide();  
     } else {
       connect();
     } 
@@ -72,23 +69,6 @@ var SocketHandler = (function(){
     ExternalUX.socket_disconnected();
   };  
 
-  function updateTankState(tank_state) {  
-    var x = tank_state.position.x;
-    var y = tank_state.position.y;
-    $('#position').html( "(" + Number(x.toFixed(2)) +", " + Number(y.toFixed(2)) +") "
-        + " speed: " + Number(tank_state.speed.toFixed(3)) 
-        + " rotation: " + Number(tank_state.rotation.toFixed(2))
-        );
-    //console.log("Drawing tank at: "+x+ ", "+y);
-    GameWindow.update_tank_state(tank_state);
-    ExternalUX.update_tank_state(tank_state);
-    messages++;
-    $('#message_count').html(messages);
-  }
-  function updateBulletList(bullet_list) {
-    GameWindow.update_bullet_list(bullet_list);
-    ExternalUX.update_bullet_list(bullet_list);
-  }
 
   function onMessage(evt) { 
     message = JSON.parse(evt.data);
@@ -97,11 +77,19 @@ var SocketHandler = (function(){
       // TODO save player id
       ExternalUX.game_connected();
     }
-    if ( message.player_tank_physics !== undefined) {
-      updateTankState(message["player_tank_physics"]);
-      updateBulletList(message["bullet_list"]);
+    if ( message.state_update !== undefined) {
+      updateTankState(message["state_update"]["player_tank_physics"]);
+      updateBulletList(message["state_update"]["bullet_list"]);
     }
   };  
+  function updateTankState(tank_state) {  
+    GameWindow.update_tank_state(tank_state);
+    ExternalUX.update_tank_state(tank_state);
+  }
+  function updateBulletList(bullet_list) {
+    GameWindow.update_bullet_list(bullet_list);
+    ExternalUX.update_bullet_list(bullet_list);
+  }
 
   function onError(evt) {
     ExternalUX.error(evt);

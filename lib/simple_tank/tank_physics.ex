@@ -2,7 +2,8 @@ defmodule SimpleTank.TankPhysics do
   defstruct last_updated: SimpleTank.Time.now,
             position: %{ x: 0, y: 0},
             rotation: :math.pi / -2.0,
-            speed: 0.0
+            speed: 0.0,
+            angular_velocity: 0.0
 
   @forward_acceleration 1.75
   @forward_braking 3.0
@@ -22,9 +23,7 @@ defmodule SimpleTank.TankPhysics do
   def update(physics, control_state ) do
     { delta, now } = SimpleTank.Time.delta( physics.last_updated)
     speed = apply_acceleration(physics.speed, control_state.acceleration, delta)
-    #speed = 0.0
-    rotation = 0.0
-    rotation = apply_rotation(physics.rotation, control_state.rotation, delta)
+    { rotation, angular_velocity } = apply_rotation(physics.rotation, control_state.rotation, delta)
     #IO.puts "rotation state: #{control_state.rotation.state} old: #{physics.rotation} new: #{rotation}"
     vel = velocity(rotation, speed)
     px = vel.x * delta + physics.position.x
@@ -32,6 +31,7 @@ defmodule SimpleTank.TankPhysics do
     new_physics = %{ physics | last_updated: now,
                                position: %{ x: px, y: py },
                                rotation: rotation,
+                               angular_velocity: angular_velocity,
                                speed: speed
     }
     #IO.puts("(TP upd) #{inspect(%{speed: physics.speed, delta: delta, vel: vel})}")
@@ -45,10 +45,17 @@ defmodule SimpleTank.TankPhysics do
     }    
   end  
 
-  def apply_rotation(angle, :left, delta),  do: angle - (delta * @rotation_speed)
-  def apply_rotation(angle, :right, delta), do: angle + (delta * @rotation_speed)
-  def apply_rotation(angle, :off, _),       do: angle 
-
+  def apply_rotation(angle, :left, delta)  do
+    { angle - (delta * @rotation_speed),
+      @rotation_speed 
+    }
+  end
+  def apply_rotation(angle, :right, delta) do
+    { angle + (delta * @rotation_speed),
+      @rotation_speed * -1
+    }
+  end
+  def apply_rotation(angle, :off, _), do: { angle, 0.0 }
 
   def apply_acceleration(speed, :off, _) when (abs(speed) < @minimum_speed) do 
     0.0
