@@ -13,10 +13,16 @@ var ExternalUX = (function () {
   }
 
   my.socket_connected = function() {
-    $('#connection').html('<span style="color: green;">CONNECTED </span>'); 
+    $('#socket_connection').html('ON'); 
   }
   my.socket_disconnected = function() {
-    $('#connection').html('<span style="color: red;">NOT CONNECTED </span>'); 
+    $('#socket_connection').html('OFF'); 
+  }
+  my.game_connected = function() {
+    $('#game_connection').html('ON'); 
+  }
+  my.game_disconnected = function() {
+    $('#game_connection').html('OFF'); 
   }
   my.update_bullet_list = function(bullet_list) {
     $('#bullet_count').html(bullet_list.length); 

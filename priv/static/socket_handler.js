@@ -7,18 +7,20 @@ var SocketHandler = (function(){
 
   my.init = function() {
     wsHost = "ws://" + window.location.host + "/websocket";
+    ExternalUX.socket_disconnected();
+    ExternalUX.game_disconnected();
     if(!("WebSocket" in window)){  
-      $('#status').append('<p><span style="color: red;">websockets are not supported </span></p>');
+      $('#connection').html('<span style="color: red;">websockets are not supported </span>');
       $("#navigation").hide();  
     } else {
-      //$('#status').append('<p><span style="color: green;">websockets are supported </span></p>');
       connect();
-    };
+    } 
   };
   my.transmit = function(object) {
     sendJSON(object);
   }
   my.connect_to_game = function() {   
+    console.log("attempting connection, readyState is ", websocket.readyState, websocket.OPEN);
     if(!websocket.readyState == websocket.OPEN) {
       connect();
     }
@@ -31,15 +33,14 @@ var SocketHandler = (function(){
 
   // Private methods
   function connect() {
-    //wsHost = $("#server").val()
-    websocket = new WebSocket(wsHost);
-    websocket.onopen = function(evt) { onOpen(evt) }; 
-    websocket.onclose = function(evt) { onClose(evt) }; 
-    websocket.onmessage = function(evt) { onMessage(evt) }; 
-    websocket.onerror = function(evt) { onError(evt) }; 
-    ExternalUX.socket_connected();
+    if (websocket == undefined || !(websocket.readyState == websocket.OPEN)) {
+      websocket = new WebSocket(wsHost);
+      websocket.onopen = function(evt) { onOpen(evt) }; 
+      websocket.onclose = function(evt) { onClose(evt) }; 
+      websocket.onmessage = function(evt) { onMessage(evt) }; 
+      websocket.onerror = function(evt) { onError(evt) }; 
+    }
   };  
-
 
   function disconnect() {
     websocket.close();
@@ -90,21 +91,17 @@ var SocketHandler = (function(){
   }
 
   function onMessage(evt) { 
-    //console.log(evt.data);
-    //try {
-      message = JSON.parse(evt.data);
-      ExternalUX.message_received(evt.data);
-      if ( message.player_tank_physics !== undefined) {
-        updateTankState(message["player_tank_physics"]);
-        updateBulletList(message["bullet_list"]);
-      }
-      //else {
-        //showScreen('<span style="color: blue;">RESPONSE: ' + evt.data+ '</span>'); 
-      //}
-    //} catch(err) {
-      //console.log(err); 
-      //console.log("Could not JSON parse event message: "+evt.data)
-    //}
+    console.log(evt.data);
+    message = JSON.parse(evt.data);
+    ExternalUX.message_received(evt.data);
+    if (message.player_id !== undefined) {
+      // TODO save player id
+      ExternalUX.game_connected();
+    }
+    if ( message.player_tank_physics !== undefined) {
+      updateTankState(message["player_tank_physics"]);
+      updateBulletList(message["bullet_list"]);
+    }
   };  
 
   function onError(evt) {

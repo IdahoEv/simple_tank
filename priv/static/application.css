@@ -27,7 +27,11 @@ body {
 }
 #header {
   text-align: center;
-  background: #999;
+  background: #ccc;
+}
+#connection {
+  font-size: 200%;
+  font-weight: bold;
 }
 #content {
   border-top: 1px solid black;
@@ -46,11 +50,11 @@ body {
 }
 
 #sent_messages {
-  width: 45%;
+  width: 30%;
   float: left;
 }
 #received_messages {
-  width: 45%;
+  width: 65%;
   float: right; 
 }
 #debugging_info {

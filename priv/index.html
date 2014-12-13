@@ -21,7 +21,7 @@
     <div id="header" class='clearfix'>
       <h1>Tankity Tank</h1>
       <div id="status">
-        <div class='connection'>
+        <div id='connection'>
         </div>
       </div>
 
@@ -34,6 +34,13 @@
 
     <div id="content">
       <div id="status_bar">				
+        <div class='section'>
+          <table>
+            <caption>Connection</caption>
+            <tr><th>Socket</th><td id='socket_connection'></td>
+            <tr><th>Game</th><td id='game_connection'></td>
+          </table>
+        </div>
         <div class='section'>
           <table>
             <caption>Tank State</caption>
