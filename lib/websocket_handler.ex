@@ -1,6 +1,8 @@
 defmodule WebsocketHandler do
   @behaviour :cowboy_websocket_handler
 
+  alias SimpleTank.Player
+
   def init({_tcp, _http}, _req, _opts) do
     {:upgrade, :protocol, :cowboy_websocket}
   end
@@ -29,15 +31,16 @@ defmodule WebsocketHandler do
     end
   end
 
+  def handle_message(%{ "controls" => control_map }, req, %Player{} = player) do
+    #IO.puts "Updating #{inspect(player.tank_pid)} with controls #{inspect(control_map)} "
+    SimpleTank.Tank.update_controls(player.tank_pid, control_map) 
+    { :ok, req, player }
+  end
   # Refuse control messages if there's no player for this websocket.  Shut down
   # instead, forcing the user to reconnect.
   def handle_message(%{ "controls" => _control_map }, req, _state) do
+    IO.puts "Shutting down websocket - controls came in with state #{inspect(_state)}"
     { :shutdown, req, _state }
-  end
-  def handle_message(%{ "controls" => control_map }, req, player) do
-    #IO.puts "Updating #{inspect(tank_pid)} with controls #{inspect(control_map)} "
-    SimpleTank.Tank.update_controls(player.tank_pid, control_map) 
-    { :ok, req, player }
   end
 
   def handle_message(message, req, state) do

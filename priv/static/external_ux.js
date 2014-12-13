@@ -28,9 +28,11 @@ var ExternalUX = (function () {
     $('#bullet_count').html(bullet_list.length); 
   }
   my.update_tank_state = function(tank_state) {
-    $('#tank_coords').html(round(tank_state.position.x) + ", " + round(tank_state.position.y)); 
-    $('#tank_speed').html(round(tank_state.speed)); 
-    $('#tank_orientation').html(round(tank_state.rotation)); 
+    $('#tank_coords').html(my.round(tank_state.position.x) 
+        + ", " 
+        + my.round(tank_state.position.y)); 
+    $('#tank_speed').html(my.round(tank_state.speed)); 
+    $('#tank_orientation').html(my.round(tank_state.rotation)); 
   }
   my.message_sent = function(message) {
     messages_sent++;
@@ -66,7 +68,7 @@ var ExternalUX = (function () {
     $(destination + " .message_container").prepend(formatMessage(msg));
   }
 
-  function round(num) {
+  my.round = function(num) {
     return Math.round(num * 100) / 100
   }
   return my

@@ -6,7 +6,7 @@ var GameWindow = (function () {
     tank_state = {},
     bullet_list = [],
     bullet_sprites = {},
-    sprite,
+    tank,
     default_width = 600,
     default_height = 600,
     scale = 32;   // pixels per unit size. Tank height/width is 1.0 unit size.
@@ -23,10 +23,11 @@ var GameWindow = (function () {
     
     game.stage.backgroundColor = "90fa60";
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
-    game.physics.arcade.enable(sprite);
 
-    sprite.anchor.setTo('0.5', '0.5');
+    tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
+    game.physics.enable(tank, Phaser.Physics.ARCADE);
+    tank.anchor.setTo('0.5', '0.5');
+
     //sprite.body.allowRotation = false;
 
     keys = [[ "UP",    KeyHandler.keyUpDown,    KeyHandler.keyUpUp ],
@@ -102,22 +103,28 @@ var GameWindow = (function () {
   }
 
   function coordPairString(coords) {
-    return "(" + coords.x + ", " + coords.y + ") "
+    return "(" 
+      + ExternalUX.round(coords.x) 
+      + ", " 
+      + ExternalUX.round(coords.y) 
+      + ")"
   }
 
   function update() {
-    console.log(coordPairString(sprite)
-        + coordPairString(sprite.body) 
-        + coordPairString(sprite.body.velocity));
+    console.log(ExternalUX.round(tank.rotation),
+        ExternalUX.round(tank.angle),
+        coordPairString(tank),
+        coordPairString(tank.body) ,
+        coordPairString(tank.body.velocity));
   }
 
 
   my.init = function(kh) {
     key_handler = kh;
-    tank_state = { position: { x: 0, y: 0},
-             speed: 0,
-             orientation: Math.PI / 2.0
-           } 
+    //tank_state = { position: { x: 0, y: 0},
+             //speed: 0,
+             //orientation: Math.PI / 2.0
+           //} 
 
     game = new Phaser.Game(default_width, default_height, Phaser.AUTO, 'gameField', 
         { preload: preload, 
@@ -127,17 +134,16 @@ var GameWindow = (function () {
   }
 
 
-  my.update_tank_state = function(new_tank_state) {
-    tank_state = new_tank_state;
-    //sprite.x = game.world.centerX + (scale*tank_state.position.x);
-    //sprite.y = game.world.centerY + (scale*tank_state.position.y);    
-    //sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
-
-    sprite.body.reset( game.world.centerX + (scale*tank_state.position.x),
-                       game.world.centerY + (scale*tank_state.position.y) 
-                      );    
-    sprite.body.velocity.x = Math.cos(sprite.angle) * tank_state.speed;
-    sprite.body.velocity.y = Math.sin(sprite.angle) * tank_state.speed;
+  my.update_tank_state = function(tank_state) {
+    tank.body.reset( game.world.centerX + (scale*tank_state.position.x),
+                     game.world.centerY + (scale*tank_state.position.y) 
+                    );    
+    tank.rotation = tank_state.rotation;
+    game.physics.arcade.velocityFromRotation(
+        tank.rotation, 
+        tank_state.speed * scale,
+        tank.body.velocity
+     );
   }
 
 

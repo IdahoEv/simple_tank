@@ -91,7 +91,6 @@ var SocketHandler = (function(){
   }
 
   function onMessage(evt) { 
-    console.log(evt.data);
     message = JSON.parse(evt.data);
     ExternalUX.message_received(evt.data);
     if (message.player_id !== undefined) {
