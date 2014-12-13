@@ -38,10 +38,11 @@ var GameWindow = (function () {
 
 
   function makeBulletSprite(bullet) {
+    console.log("Building bullet", bullet)
     var bullet_sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
     bullet_sprite.anchor.setTo('0.5', '0.5')
     setBulletPosition(bullet_sprite, bullet);
-    bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI) + 90;
+    bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI);
     bullet_sprites[bullet.id] = bullet_sprite
   }
 
@@ -105,9 +106,10 @@ var GameWindow = (function () {
 
   function tankStateDebug() {
     if(tank != undefined) {
-      console.log(ExternalUX.round(tank.rotation),
-          ExternalUX.round(tank.angle),
-          ExternalUX.round(tank.angularVelocity),
+      game.debug.spriteInfo(tank,20,20);
+      console.log(ExternalUX.round(tank.body.rotation),
+          ExternalUX.round(tank.body.angle),
+          ExternalUX.round(tank.body.angularVelocity),
           coordPairString(tank),
           coordPairString(tank.body) ,
           coordPairString(tank.body.velocity));
@@ -142,6 +144,8 @@ var GameWindow = (function () {
                      game.world.centerY + (scale*tank_state.position.y) 
                     );    
     tank.body.rotation = tank_state.rotation;
+    tank.rotation = tank_state.rotation;
+    //console.log("Set", ExternalUX.round(tank_state.rotation), "got", ExternalUX.round(tank.body.rotation));
     tank.body.angularVelocity = tank_state.angular_velocity * -180 / Math.PI ;
     game.physics.arcade.velocityFromRotation(
         tank.rotation, 
@@ -169,6 +173,7 @@ var GameWindow = (function () {
   
   my.update_bullet_list = function(new_bullet_list) {
     bullet_list = new_bullet_list;
+    updateBullets();
   }
   
   return my;

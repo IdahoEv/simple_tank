@@ -1,7 +1,7 @@
 defmodule SimpleTank.TankPhysics do
   defstruct last_updated: SimpleTank.Time.now,
             position: %{ x: 0, y: 0},
-            rotation: :math.pi / -2.0,
+            rotation: 0.0, #:math.pi / -2.0,
             speed: 0.0,
             angular_velocity: 0.0
 
@@ -19,7 +19,10 @@ defmodule SimpleTank.TankPhysics do
 
   # radians per second
   @rotation_speed 2.0
-            
+  @pi :math.pi
+  @npi (:math.pi * -1)
+  @tau (:math.pi * 2)  
+
   def update(physics, control_state ) do
     { delta, now } = SimpleTank.Time.delta( physics.last_updated)
     speed = apply_acceleration(physics.speed, control_state.acceleration, delta)
@@ -36,6 +39,7 @@ defmodule SimpleTank.TankPhysics do
     }
     #IO.puts("(TP upd) #{inspect(%{speed: physics.speed, delta: delta, vel: vel})}")
     #IO.puts("(TP upd) #{inspect(self)} New Physics: #{inspect(new_physics)}")
+    #IO.puts("Rot: #{rotation} (#{px}, #{py}) (#{vel.x}, #{vel.y}) ")
     new_physics
   end
 
@@ -46,17 +50,21 @@ defmodule SimpleTank.TankPhysics do
   end  
 
   def apply_rotation(angle, :left, delta)  do
-    { angle - (delta * @rotation_speed),
+    { clamp(angle - (delta * @rotation_speed)),
       @rotation_speed 
     }
   end
   def apply_rotation(angle, :right, delta) do
-    { angle + (delta * @rotation_speed),
+    { clamp(angle + (delta * @rotation_speed)),
       @rotation_speed * -1
     }
   end
   def apply_rotation(angle, :off, _), do: { angle, 0.0 }
 
+  def clamp(angle) when angle > @pi,  do: angle - @tau
+  def clamp(angle) when angle < @npi, do: angle + @tau
+  def clamp(angle),                   do: angle
+  
   def apply_acceleration(speed, :off, _) when (abs(speed) < @minimum_speed) do 
     0.0
   end
