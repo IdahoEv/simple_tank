@@ -101,7 +101,7 @@ var GameWindow = (function () {
   }
 
   function update() {
-    //tankStateDebug();
+    tankStateDebug();
   }
 
   function tankStateDebug() {
@@ -136,22 +136,36 @@ var GameWindow = (function () {
     tank.anchor.setTo('0.5', '0.5');
   }
 
+  function world2ScreenCoords(pointObj){
+    world2ScreenCoords(pointObj.x, pointObj.y);
+  } 
+  function world2ScreenCoords(worldX, worldY){
+    return({ x: game.world.centerX + (scale*worldX),
+             y: game.world.centerY + (scale*worldY) 
+           });
+  }
+  function world2ScreenAngVel(angular_velocity) {
+    return(angular_velocity * -180 / Math.PI);
+  }
+
+  function updatePhysicsFromState(sprite, state) {
+    coords = world2ScreenCoords(state.position);
+    sprite.body.reset( coords.x, coords.y) ;
+    sprite.body.rotation = state.rotation;
+    sprite.rotation = state.rotation;
+    sprite.body.angularVelocity = world2ScreenAngVel(state.angular_velocity); 
+    game.physics.arcade.velocityFromRotation(
+        sprite.rotation, 
+        state.speed * scale,
+        sprite.body.velocity
+     );
+  }
+
   my.update_tank_state = function(tank_state) {
     if (tank == undefined) {
       addPlayerTank();
     }
-    tank.body.reset( game.world.centerX + (scale*tank_state.position.x),
-                     game.world.centerY + (scale*tank_state.position.y) 
-                    );    
-    tank.body.rotation = tank_state.rotation;
-    tank.rotation = tank_state.rotation;
-    //console.log("Set", ExternalUX.round(tank_state.rotation), "got", ExternalUX.round(tank.body.rotation));
-    tank.body.angularVelocity = tank_state.angular_velocity * -180 / Math.PI ;
-    game.physics.arcade.velocityFromRotation(
-        tank.rotation, 
-        tank_state.speed * scale,
-        tank.body.velocity
-     );
+    updatePhysicsFromState(tank, tank_state);
   }
 
   // A cheat to improve the smoothness of apparent steering, remove the
