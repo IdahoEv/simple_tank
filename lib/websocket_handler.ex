@@ -8,7 +8,7 @@ defmodule WebsocketHandler do
   def websocket_init(_TransportName, req, _opts) do
     IO.puts "init.  Starting timer"
     :erlang.start_timer(500, self(), [])
-    {:ok, req, %{} }
+    {:ok, req, nil }
   end
 
   def websocket_handle({:text, msg}, req, state) do
@@ -20,36 +20,24 @@ defmodule WebsocketHandler do
     IO.puts "Warning, unhandled message received over socket"
     {:ok, req, state}
   end
-  
-  # New player connects.
-  def handle_message(%{ "connect" => "new", "name" => player_name }, req, state) do
-    { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self())
-    IO.puts "Player connected with tank_pid #{inspect(player.tank_pid)}"
-    {:reply, player_id_reply(player), req,  Dict.put(state, :tank_pid, player.tank_pid ) }
-  end
-
-  # Existing player reconnects.
-  def handle_message(%{ "connect" => player_id, "name" => player_name}, req, state ) do
-    player = case  SimpleTank.Game.reconnect_player(:game, player_id, self()) do
-      { :ok, player } -> 
-        player
-      { :not_found }  -> 
-        { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self() )      
+ 
+  # connect requests should come with either "new" or a player_id.
+  def handle_message(%{ "connect" => command, "name" => player_name }, req, state) do
+    case SimpleTank.PlayerConnection.connect(command, player_name, state) do
+      { :error, _ }         -> { :shutdown, req, state}
+      { return, new_state } -> { :reply, return, req, new_state }
     end
-    {:reply, player_id_reply(player), req,  Dict.put(state, :tank_pid, player.tank_pid ) }
   end
 
-  def player_id_reply(player) do
-    { :ok, reply } = JSEX.encode(%{ player_id: player.player_id })
-    { :text, reply }
+  # Refuse control messages if there's no player for this websocket.  Shut down
+  # instead, forcing the user to reconnect.
+  def handle_message(%{ "controls" => _control_map }, req, _state) do
+    { :shutdown, req, _state }
   end
-
-  # Handle control message from socket.   Pass it to the tank associated in state.
-  def handle_message(%{ "controls" => control_map }, req, state) do
-    tank_pid = Dict.get(state, :tank_pid)
+  def handle_message(%{ "controls" => control_map }, req, player) do
     #IO.puts "Updating #{inspect(tank_pid)} with controls #{inspect(control_map)} "
-    SimpleTank.Tank.update_controls(tank_pid, control_map) 
-    { :ok, req, state }
+    SimpleTank.Tank.update_controls(player.tank_pid, control_map) 
+    { :ok, req, player }
   end
 
   def handle_message(message, req, state) do
@@ -57,6 +45,11 @@ defmodule WebsocketHandler do
     { :ok, req, state }
   end
 
+  # Refuse update messages if there's no player for this websocket.  Shut down
+  # instead, forcing a reconnect.
+  def websocket_info({ :update, _msg }, req, nil ) do 
+    { :shutdown, req, nil}
+  end
   # Send an update of the world state out to the client
   def websocket_info({ :update, msg }, req, state) do 
     {:reply, {:text, msg}, req, state}

@@ -101,12 +101,16 @@ var GameWindow = (function () {
     }
   }
 
-  function update() {
-    console.log("Phaser update")
-    //console.log("Tank position: "+ tank_state.position.x + ", " + tank_state.position.y)
-
-    //updateBullets();
+  function coordPairString(coords) {
+    "(" + coords.x + ", " + coords.y + ") "
   }
+
+  function update() {
+    console.log(coordPairString(sprite));
+        //+ coordPairString(sprite.body) 
+        //+ coordPairString(sprite.body.velocity));
+  }
+
 
   my.init = function(kh) {
     key_handler = kh;
@@ -124,14 +128,14 @@ var GameWindow = (function () {
 
 
   my.update_tank_state = function(new_tank_state) {
-    console.log("UTS")
     tank_state = new_tank_state;
     //sprite.x = game.world.centerX + (scale*tank_state.position.x);
     //sprite.y = game.world.centerY + (scale*tank_state.position.y);    
     //sprite.angle = tank_state.rotation * 360 / (2 * Math.PI) + 90;
 
-    sprite.body.x = game.world.centerX + (scale*tank_state.position.x);
-    sprite.body.y = game.world.centerY + (scale*tank_state.position.y);    
+    sprite.body.reset( game.world.centerX + (scale*tank_state.position.x),
+                       game.world.centerY + (scale*tank_state.position.y) 
+                      );    
     sprite.body.velocity.x = Math.cos(sprite.angle) * tank_state.speed;
     sprite.body.velocity.y = Math.sin(sprite.angle) * tank_state.speed;
   }

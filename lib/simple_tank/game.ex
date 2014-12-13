@@ -41,7 +41,7 @@ defmodule SimpleTank.Game do
   def add_bullet(firing_tank) do
     GenServer.cast @my_pid, { :add_bullet, firing_tank }
   end
-
+  def get_players, do: GenServer.call(@my_pid, :get_players)
 
   #Server Callbacks
   
@@ -80,6 +80,11 @@ defmodule SimpleTank.Game do
         }      
     end
   end
+
+  def handle_call(:get_players, _from, state) do
+    { :reply, state.players, state}
+  end
+
   def handle_call(msg, _from, state) do
     { :stop, "Unhandled call in Game: #{inspect(msg)}", state }
   end
@@ -93,7 +98,7 @@ defmodule SimpleTank.Game do
                     firing_tank.physics.rotation)
        } 
     }
-  end
+  end  
 
   def handle_cast(msg, state) do
     { :stop, "Unhandled cast in Game: #{inspect(msg)}", state }
