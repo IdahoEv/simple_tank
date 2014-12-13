@@ -19,7 +19,7 @@ var KeyHandler = (function(){
   my.keyFireDown  = function() { updateState("trigger", "on") } 
   
   function updateState(control, state) { 
-    console.log('updateState called')
+    //console.log('updateState called');
     if (control_state[control] != state) {
       control_state[control] = state;
       transmit();

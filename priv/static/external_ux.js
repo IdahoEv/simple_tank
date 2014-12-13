@@ -54,7 +54,7 @@ var ExternalUX = (function () {
   }
 
   function formatMessage(message) {
-    "<p class='message'>" + message + "</p>";
+    return "<p class='message'>" + message + "</p>";
   }
   function displayMessage(destination,msg) {
     $(destination + " .message_container").prepend(formatMessage(msg));

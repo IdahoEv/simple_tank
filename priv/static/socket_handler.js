@@ -57,7 +57,7 @@ var SocketHandler = (function(){
     if(websocket.readyState == websocket.OPEN){
       string_message = JSON.stringify(message);
       websocket.send(string_message);
-      ExternalUX.message_sent(message);
+      ExternalUX.message_sent(string_message);
     } else {
       ExternalUX.socket_disconnected();
     };

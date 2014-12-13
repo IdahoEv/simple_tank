@@ -102,13 +102,13 @@ var GameWindow = (function () {
   }
 
   function coordPairString(coords) {
-    "(" + coords.x + ", " + coords.y + ") "
+    return "(" + coords.x + ", " + coords.y + ") "
   }
 
   function update() {
-    console.log(coordPairString(sprite));
-        //+ coordPairString(sprite.body) 
-        //+ coordPairString(sprite.body.velocity));
+    console.log(coordPairString(sprite)
+        + coordPairString(sprite.body) 
+        + coordPairString(sprite.body.velocity));
   }
 
 
