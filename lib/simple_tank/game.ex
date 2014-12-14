@@ -145,9 +145,7 @@ defmodule SimpleTank.Game do
     tank_updates = PS.tank_list(state.players)
     IO.puts "tank_updates #{inspect(tank_updates)}"
     
-    bullet_updates = Enum.into(state.bullet_list, %{}, fn(bullet) -> 
-      PS.for_bullet(bullet)
-    end)
+    bullet_updates = PS.bullet_list(state.bullet_list)
     IO.puts "bullet_updates #{inspect(bullet_updates)}"
 
     # TODO: only do the JSON conversion of tanks and bullet list once, 
@@ -157,7 +155,7 @@ defmodule SimpleTank.Game do
         state_update: %{ 
           player_id: player_id,
           public_id: player.public_id,
-          player_tank: "", #TODO: make private state converter. Was:  Dict.get(tank_states, player, nil),             
+          player_tank: SimpleTank.PrivateTankState.for_tank(player),
           bullets: bullet_updates,
           tanks: tank_updates
         }
