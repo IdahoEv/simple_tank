@@ -11,6 +11,12 @@ defmodule SimpleTank.PublicState do
     end)
   end
 
+  def bullet_list(bullet_list) do
+    Enum.into(bullet_list, %{}, fn(bullet) ->
+      for_bullet(bullet)
+    end)    
+  end
+
   def for_tank(player) do
     tank_state = SimpleTank.Tank.get_state(player.tank_pid)    
     { player.public_id, 

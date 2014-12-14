@@ -91,6 +91,22 @@ defmodule PublicStateFacts do
       }
   end
 
+  fact "for bullet list" do
+    bl1 = fixture_bullet(1)
+    bl2 = fixture_bullet(2) 
+
+    state = PublicState.bullet_list([bl1, bl2])
+    state            |> !equals nil
+    is_map(state)    |> truthy
+    Dict.size(state) |> equals 2
+    Dict.keys(state) |> contains("bullet_id_1")
+    Dict.keys(state) |> contains("bullet_id_2")
+    is_map(Dict.get(state, "bullet_id_1")) |> truthy
+    is_map(Dict.get(state, "bullet_id_2")) |> truthy
+    Dict.get(state, "bullet_id_1").position.x |> equals 1.1
+    Dict.get(state, "bullet_id_2").position.y |> equals 2.2
+  end
+
   facts "for bullet" do
     alias SimpleTank.Bullet
     
