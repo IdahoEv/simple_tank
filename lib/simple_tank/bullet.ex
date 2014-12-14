@@ -4,20 +4,23 @@ defmodule SimpleTank.Bullet do
             last_updated: 0,
             position: %{ x: 0, y: 0},
             velocity: %{ x: 0, y: 0},
-            angle: 0
+            speed: 0,
+            angular_velocity: 0,
+            rotation: 0
 
   @speed    10.0  # units/sec
   @lifetime 2.0   # sec
 
-  def new(position, angle) do
+  def new(position, rotation) do
     now = SimpleTank.Time.now
     %SimpleTank.Bullet{ 
        id: SimpleTank.Time.uniq_nanosec,
        fired: now,
        last_updated: now,
        position: position,
-       velocity: velocity(angle, @speed),
-       angle: angle
+       velocity: velocity(rotation, @speed),
+       speed: @speed,
+       rotation: rotation
     }
   end
 

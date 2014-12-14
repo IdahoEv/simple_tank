@@ -39,25 +39,20 @@ var GameWindow = (function () {
 
   function makeBulletSprite(bullet) {
     console.log("Building bullet", bullet)
-    var bullet_sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'shell');
+    coords = worldPoint2ScreenCoords(bullet.position);
+    var bullet_sprite = game.add.sprite(coords.x, coords.y, 'shell');
+    game.physics.enable(bullet_sprite, Phaser.Physics.ARCADE);
     bullet_sprite.anchor.setTo('0.5', '0.5')
-    setBulletPosition(bullet_sprite, bullet);
-    bullet_sprite.angle = bullet.angle * 360 / (2 * Math.PI);
+    updatePhysicsFromState(bullet_sprite, bullet);
     bullet_sprites[bullet.id] = bullet_sprite
   }
-
-
-  function setBulletPosition(sprite, bullet) {
-    sprite.x =  game.world.centerX + (scale*bullet.position.x);
-    sprite.y =  game.world.centerY + (scale*bullet.position.y);
+  function makePlayerTankSprite() {
+    my.tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
+    game.physics.enable(my.tank, Phaser.Physics.ARCADE);
+    my.tank.anchor.setTo('0.5', '0.5');
   }
 
-   
-
   function updateBullets() {
-    //console.log("Total bullets/sprites: "+bullet_list.length);
-    //console.log(bullet_sprites);
-        //+ "/" + bullet_sprites.length);
     var existing_sprite_ids = Object.keys(bullet_sprites);
     var bullet_sprite;
 
@@ -67,9 +62,11 @@ var GameWindow = (function () {
 
       // if the sprites array already contains this bullet, update it
       if (existing_sprite_ids.indexOf(bullet.id.toString()) > -1) {
-        console.log('updating existing sprite');
+
         bullet_sprite = bullet_sprites[bullet.id];
-        setBulletPosition(bullet_sprite, bullet);
+        updatePhysicsFromState(bullet_sprite, bullet);
+        //debugSpriteState (bullet_sprite, "bullet_sprite_"+bullet.id);
+        //debugPhysicsState(bullet,        "bullet_state_"+bullet.id);
         existing_sprite_ids.splice(
           existing_sprite_ids.indexOf(bullet.id.toString()),1
         )
@@ -101,45 +98,37 @@ var GameWindow = (function () {
   }
 
   function update() {
-    tankStateDebug();
+    //tankStateDebug();
   }
 
-  function tankStateDebug() {
-    if(tank != undefined) {
-      game.debug.spriteInfo(tank,20,20);
-      console.log(ExternalUX.round(tank.body.rotation),
-          ExternalUX.round(tank.body.angle),
-          ExternalUX.round(tank.body.angularVelocity),
-          coordPairString(tank),
-          coordPairString(tank.body) ,
-          coordPairString(tank.body.velocity));
+  function tankStateDebug(physics_state) {
+    if(my.tank != undefined) {
+      game.debug.spriteInfo(my.tank,20,20);
+      debugSpriteState(my.tank, 'tank sprite');
+      debugPhysicsState(physics_state, 'tank physics');
     }
   }
-
-  my.init = function(kh) {
-    key_handler = kh;
-    //tank_state = { position: { x: 0, y: 0},
-             //speed: 0,
-             //orientation: Math.PI / 2.0
-           //} 
-
-    game = new Phaser.Game(default_width, default_height, Phaser.AUTO, 'gameField', 
-        { preload: preload, 
-          create: create,
-          update: update });
-
+  function debugSpriteState(sprite, id) {
+    if (typeof id == undefined) { id = 'N/A' }
+    console.log(id, {
+      rotation: ExternalUX.round(sprite.body.rotation),
+      angle: ExternalUX.round(sprite.body.angle),
+      angular_velocity:  ExternalUX.round(sprite.body.angularVelocity),
+      sprite_position: coordPairString(sprite),
+      body_position: coordPairString(sprite.body),
+      body_velocity: coordPairString(sprite.body.velocity)
+    });
+  }
+  function debugPhysicsState(physics, id) {
+    if (typeof id == undefined) { id = 'N/A' }
+    console.log(id, physics);
   }
 
-  function addPlayerTank() {
-    tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
-    game.physics.enable(tank, Phaser.Physics.ARCADE);
-    tank.anchor.setTo('0.5', '0.5');
-  }
 
-  function world2ScreenCoords(pointObj){
-    world2ScreenCoords(pointObj.x, pointObj.y);
+  function worldPoint2ScreenCoords(pointObj){
+    return worldCoords2ScreenCoords(pointObj.x, pointObj.y);
   } 
-  function world2ScreenCoords(worldX, worldY){
+  function worldCoords2ScreenCoords(worldX, worldY){
     return({ x: game.world.centerX + (scale*worldX),
              y: game.world.centerY + (scale*worldY) 
            });
@@ -148,36 +137,46 @@ var GameWindow = (function () {
     return(angular_velocity * -180 / Math.PI);
   }
 
-  function updatePhysicsFromState(sprite, state) {
-    coords = world2ScreenCoords(state.position);
-    sprite.body.reset( coords.x, coords.y) ;
-    sprite.body.rotation = state.rotation;
-    sprite.rotation = state.rotation;
-    sprite.body.angularVelocity = world2ScreenAngVel(state.angular_velocity); 
+  function updatePhysicsFromState(the_sprite, state) {
+    coords = worldPoint2ScreenCoords(state.position);
+    the_sprite.body.reset( coords.x, coords.y) ;
+    the_sprite.body.rotation = state.rotation;
+    the_sprite.rotation = state.rotation;
+    the_sprite.body.angularVelocity = world2ScreenAngVel(state.angular_velocity); 
     game.physics.arcade.velocityFromRotation(
-        sprite.rotation, 
+        the_sprite.rotation, 
         state.speed * scale,
-        sprite.body.velocity
+        the_sprite.body.velocity
      );
   }
 
+  my.init = function(kh) {
+    key_handler = kh;
+
+    game = new Phaser.Game(default_width, default_height, Phaser.AUTO, 'gameField', 
+        { preload: preload, 
+          create: create,
+          update: update });
+  }
+
   my.update_tank_state = function(tank_state) {
-    if (tank == undefined) {
-      addPlayerTank();
+    if (my.tank == undefined) {
+      makePlayerTankSprite();
     }
-    updatePhysicsFromState(tank, tank_state);
+    updatePhysicsFromState(my.tank, tank_state);
+    //tankStateDebug(tank_state);
   }
 
   // A cheat to improve the smoothness of apparent steering, remove the
   // "drifty" effect of server lag.
   my.update_UI_steering = function(direction) {
-    if (tank == undefined) {
+    if (my.tank == undefined) {
       if (direction == 'left') {
-        tank.body.angularVelocity = tank_state.angular_velocity * -360 / Math.PI ;
+        my.tank.body.angularVelocity = tank_state.angular_velocity * -360 / Math.PI ;
       } else if (direction == 'right') {
-        tank.body.angularVelocity = tank_state.angular_velocity * 360 / Math.PI ;
+        my.tank.body.angularVelocity = tank_state.angular_velocity * 360 / Math.PI ;
       } else {
-        tank.body.angularVelocity = 0.0
+        my.tank.body.angularVelocity = 0.0
       }   
     }   
   }

@@ -39,6 +39,7 @@ defmodule SimpleTank.Tank do
   end
 
   def handle_cast( :fire, tank) do
+    #IO.puts "New bullet at #{tank.physics.position.x} #{tank.physics.position.y}"
     SimpleTank.Game.add_bullet(tank)
     { :noreply, %{ tank | last_fired: SimpleTank.Time.now } }
   end
