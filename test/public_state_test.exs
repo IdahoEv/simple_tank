@@ -29,11 +29,11 @@ defmodule PublicStateFacts do
         websocket_pid: "websocket_pid_1"
       }
       provided [ SimpleTank.Tank.get_state(_) |> tank ] do
-        state = PublicState.for_tank(player)
+        {id , state} = PublicState.for_tank(player)
         state |> !equals nil 
 
-        # thinks
-        state.id        |> equals "public_id_1"
+        # things the state should have
+        id              |> equals "public_id_1"
         state.name      |> equals "player_name_1"
         state.position  |> equals %{ x: 5.5, y: 4.5 }
         state.rotation  |> equals 1.75
@@ -64,11 +64,11 @@ defmodule PublicStateFacts do
             rotation: 1.75
       }
       
-      state = PublicState.for_bullet(bullet)
+      { id, state } = PublicState.for_bullet(bullet)
       state |> !equals nil 
 
       # things the bullet state should have
-      state.id        |> equals "id_1234"
+      id              |> equals "id_1234"
       state.position  |> equals %{ x: 123.4, y: 234.5 }
       state.rotation  |> equals 1.75
       state.speed     |> equals 8.0
