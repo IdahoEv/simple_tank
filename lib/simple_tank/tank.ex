@@ -17,7 +17,7 @@ defmodule SimpleTank.Tank do
   # Public API
   def update_controls(pid, cmd),  do: GenServer.cast(pid, { :update_controls, cmd })
   def update(pid),                do: GenServer.cast(pid, :update)
-  def get_public_state(pid),      do: GenServer.call(pid, :get_public_state)
+  def get_state(pid),             do: GenServer.call(pid, :get_state)
   def fire(pid) do
     GenServer.cast(pid, :fire)
   end
@@ -29,8 +29,8 @@ defmodule SimpleTank.Tank do
   end
 
   # GenServer call and cast handlers
-  def handle_call(:get_public_state, _from, tank  ) do
-    { :reply, tank.physics, tank }
+  def handle_call(:get_state, _from, tank  ) do
+    { :reply, tank, tank }
   end
 
   def handle_cast({ :update_controls, controls}, tank  ) do

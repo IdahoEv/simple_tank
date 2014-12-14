@@ -4,8 +4,8 @@ var GameWindow = (function () {
     game,
     key_handler,
     tank_state = {},
-    bullet_list = [],
     bullet_sprites = {},
+    tank_sprites = {},
     tank,
     default_width = 600,
     default_height = 600,
@@ -37,14 +37,19 @@ var GameWindow = (function () {
   }
 
 
-  function makeBulletSprite(bullet) {
-    console.log("Building bullet", bullet)
-    coords = worldPoint2ScreenCoords(bullet.position);
-    var bullet_sprite = game.add.sprite(coords.x, coords.y, 'shell');
-    game.physics.enable(bullet_sprite, Phaser.Physics.ARCADE);
-    bullet_sprite.anchor.setTo('0.5', '0.5')
-    updatePhysicsFromState(bullet_sprite, bullet);
-    bullet_sprites[bullet.id] = bullet_sprite
+  function makeSpriteFromState(sprite_list, id, state, sprite_name) {
+    coords = worldPoint2ScreenCoords(state.position);
+    var new_sprite = game.add.sprite(coords.x, coords.y, sprite_name);
+    game.physics.enable(new_sprite, Phaser.Physics.ARCADE);
+    new_sprite.anchor.setTo('0.5', '0.5')
+    updatePhysicsFromState(new_sprite, state);
+    new_sprites[id] = new_sprite
+  }
+  function newTankSprite(tank_id, tank_state) {
+    makeSpriteFromState( tank_sprites, tank_id, tank_state, 'tank');
+  }
+  function newBulletSprite(bullet_id, bullet_state) {
+    makeSpriteFromState( bullet_sprites, bullet_id, bullet_state, 'shell');
   }
   function makePlayerTankSprite() {
     my.tank = game.add.sprite(game.world.centerX, game.world.centerY, 'tank');
@@ -52,42 +57,82 @@ var GameWindow = (function () {
     my.tank.anchor.setTo('0.5', '0.5');
   }
 
-  function updateBullets() {
-    var existing_sprite_ids = Object.keys(bullet_sprites);
-    var bullet_sprite;
+  function updateAndFilter(sprites, updates, newSpriteFunction) {
+    var sprite_ids  = Object.keys(sprites);
+    var update_ids  = Object.keys(updates);
+    var common_ids  = intersect(sprite_ids, update_ids);
+    var new_ids     = update_ids.diff(common_ids);
+    var deleted_ids = sprite_ids.diff(common_ids);
 
-    // Make sure all listed bullets are updated or created
-    for (var bn = 0; bn < bullet_list.length; bn++) {
-      var bullet = bullet_list[bn];
+    // delete any sprites not present in the update list
+    deleted_ids.forEach(function(sid) { removeSprite(sprites, sid) });
+   
+    // update all surviving sprites
+    common_ids.forEach(function(sid)) { updateSpriteState(sprites[sid], updates[sid]) };
 
-      // if the sprites array already contains this bullet, update it
-      if (existing_sprite_ids.indexOf(bullet.id.toString()) > -1) {
-
-        bullet_sprite = bullet_sprites[bullet.id];
-        updatePhysicsFromState(bullet_sprite, bullet);
-        //debugSpriteState (bullet_sprite, "bullet_sprite_"+bullet.id);
-        //debugPhysicsState(bullet,        "bullet_state_"+bullet.id);
-        existing_sprite_ids.splice(
-          existing_sprite_ids.indexOf(bullet.id.toString()),1
-        )
-      // otherwise make a new sprite  
-      } else { 
-        console.log('creating new sprite');
-        makeBulletSprite(bullet); 
-      }
-    }
-
-    // remove any bullet sprites that do not exist in the server update
-    for (var sin = 0; sin < existing_sprite_ids.length; sin++) {
-
-      sid = existing_sprite_ids[sin];
-      console.log('deleting sprite with id '+ sid);
-      bullet_sprite = bullet_sprites[sid];
-      bullet_sprite.kill;
-      bullet_sprite.parent.removeChild(bullet_sprite);
-      delete bullet_sprites[sid];
-    }
+    // create a sprite for each new one
+    new_ids.forEach(function(uid){ newSpriteFunction(uid, updates[uid])});
   }
+
+  // Given a JSON update with physics information, force the sprite to match
+  // that new state
+  function updateSpriteState(the_sprite, state) {
+    var coords = worldPoint2ScreenCoords(state.position);
+    the_sprite.body.reset( coords.x, coords.y) ;
+    the_sprite.body.rotation = state.rotation;
+    the_sprite.rotation = state.rotation;
+    the_sprite.body.angularVelocity = world2ScreenAngVel(state.angular_velocity); 
+    game.physics.arcade.velocityFromRotation(
+        the_sprite.rotation, 
+        state.speed * scale,
+        the_sprite.body.velocity
+     );
+  }
+
+  // Remove a sprite both from Phaser's world and from the sprite list 
+  function removeSprite(sprite_list, sprite_id) {
+    var sprite = sprite_list[sprite_id];
+    sprite.kill;
+    sprite.parent.removeChild(sprite);
+    delete sprite_list[sprite_id];
+  }
+
+  //function updateBullets() {
+    //var existing_sprite_ids = Object.keys(bullet_sprites);
+    //var bullet_sprite;
+
+    //// Make sure all listed bullets are updated or created
+    //for (var bn = 0; bn < bullet_list.length; bn++) {
+      //var bullet = bullet_list[bn];
+
+      //// if the sprites array already contains this bullet, update it
+      //if (existing_sprite_ids.indexOf(bullet.id.toString()) > -1) {
+
+        //bullet_sprite = bullet_sprites[bullet.id];
+        //updatePhysicsFromState(bullet_sprite, bullet);
+        ////debugSpriteState (bullet_sprite, "bullet_sprite_"+bullet.id);
+        ////debugPhysicsState(bullet,        "bullet_state_"+bullet.id);
+        //existing_sprite_ids.splice(
+          //existing_sprite_ids.indexOf(bullet.id.toString()),1
+        //)
+      //// otherwise make a new sprite  
+      //} else { 
+        //console.log('creating new sprite');
+        //makeBulletSprite(bullet); 
+      //}
+    //}
+
+    //// remove any bullet sprites that do not exist in the server update
+    //for (var sin = 0; sin < existing_sprite_ids.length; sin++) {
+
+      //sid = existing_sprite_ids[sin];
+      //console.log('deleting sprite with id '+ sid);
+      //bullet_sprite = bullet_sprites[sid];
+      //bullet_sprite.kill;
+      //bullet_sprite.parent.removeChild(bullet_sprite);
+      //delete bullet_sprites[sid];
+    //}
+  //}
 
   function coordPairString(coords) {
     return "(" 
@@ -96,6 +141,7 @@ var GameWindow = (function () {
       + ExternalUX.round(coords.y) 
       + ")"
   }
+
 
   function update() {
     //tankStateDebug();
@@ -137,19 +183,6 @@ var GameWindow = (function () {
     return(angular_velocity * -180 / Math.PI);
   }
 
-  function updatePhysicsFromState(the_sprite, state) {
-    coords = worldPoint2ScreenCoords(state.position);
-    the_sprite.body.reset( coords.x, coords.y) ;
-    the_sprite.body.rotation = state.rotation;
-    the_sprite.rotation = state.rotation;
-    the_sprite.body.angularVelocity = world2ScreenAngVel(state.angular_velocity); 
-    game.physics.arcade.velocityFromRotation(
-        the_sprite.rotation, 
-        state.speed * scale,
-        the_sprite.body.velocity
-     );
-  }
-
   my.init = function(kh) {
     key_handler = kh;
 
@@ -159,12 +192,16 @@ var GameWindow = (function () {
           update: update });
   }
 
-  my.update_tank_state = function(tank_state) {
+  my.updateWorldState = function(world_state) {
     if (my.tank == undefined) {
-      makePlayerTankSprite();
+      makePlayerTankSprite(world_state.player_tank);
     }
-    updatePhysicsFromState(my.tank, tank_state);
-    //tankStateDebug(tank_state);
+    var player_public_id = world_state.player_tank.public_id;
+
+    updatePhysicsFromState(my.tank, world_state.player_tank);
+    updateAndFilter(bullet_sprites, world_state.bullets, newBulletSprite);
+    world_state.tanks.delete[public_id];  // don't show self tank in other sprites list
+    updateAndFilter(tank_sprites,   world_state.tanks, newBulletSprite);   
   }
 
   // A cheat to improve the smoothness of apparent steering, remove the
@@ -190,4 +227,4 @@ var GameWindow = (function () {
   }
   
   return my;
-}());
+}());   

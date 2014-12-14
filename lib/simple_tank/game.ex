@@ -152,7 +152,8 @@ defmodule SimpleTank.Game do
     Enum.each(state.players, fn({player_id, player}) ->
       {:ok, json} = JSEX.encode(%{ state_update: %{ 
         player_id: player_id,
-        player_tank_physics: Dict.get(tank_states, player, nil),             
+        public_id: player.public_id,
+        player_tank: Dict.get(tank_states, player, nil),             
         bullet_list: bullets,
         tanks: public_tank_states
       }})
