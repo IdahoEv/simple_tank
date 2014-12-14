@@ -5,7 +5,6 @@ defmodule SimpleTank.Bullet do
             position: %{ x: 0, y: 0},
             velocity: %{ x: 0, y: 0},
             speed: 0,
-            angular_velocity: 0,
             rotation: 0
 
   @speed    10.0  # units/sec
