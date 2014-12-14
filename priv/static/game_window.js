@@ -68,7 +68,7 @@ var GameWindow = (function () {
     deleted_ids.forEach(function(sid) { removeSprite(sprites, sid) });
    
     // update all surviving sprites
-    common_ids.forEach(function(sid)) { updateSpriteState(sprites[sid], updates[sid]) };
+    common_ids.forEach(function(sid) { updateSpriteState(sprites[sid], updates[sid]) });
 
     // create a sprite for each new one
     new_ids.forEach(function(uid){ newSpriteFunction(uid, updates[uid])});

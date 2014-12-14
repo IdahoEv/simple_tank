@@ -125,6 +125,7 @@ defmodule SimpleTank.Game do
   def handle_info(:update_clients, state) do
     #IO.puts("Updating #{Dict.size(state.players)} clients") 
     Process.send_after(self(), :update_clients, @client_update_interval)
+    alias SimpleTank.PublicState, as: PS 
 
     # map the player list onto physics state of each tank
     # We get a Dict of player -> tank state.  This is keyed by
@@ -132,7 +133,7 @@ defmodule SimpleTank.Game do
     # not be directly returned to any player, but is used to construct
     # the items that will be.    
     tank_states = Enum.into(state.players, %{}, fn({_player_id, player}) -> 
-      {player, SimpleTank.Tank.get_public_state(player.tank_pid)} 
+      {player, PS.for_tank(player) } 
     end)
 
     #IO.puts "Tank states: #{inspect(tank_states)}"
@@ -141,22 +142,29 @@ defmodule SimpleTank.Game do
     # instead of player.  It's done as a second step so that tank_states
     # can still be used as a fast way of pulling the current player's 
     # private state, without having to fetch it from the Tank server again. 
-    public_tank_states = Enum.into(tank_states, %{}, fn({player, tank_state}) -> 
-      {player.name, tank_state} 
+    tank_updates = Enum.into(tank_states, %{}, fn({player, tank_state_with_id}) -> 
+      tank_state_with_id 
     end)
+    IO.puts "tank_updates #{inspect(tank_updates)}"
     
-    bullets = state.bullet_list 
+    bullet_updates = Enum.into(state.bullet_list, %{}, fn(bullet) -> 
+      PS.for_bullet(bullet)
+    end)
+    IO.puts "bullet_updates #{inspect(bullet_updates)}"
 
     # TODO: only do the JSON conversion of tanks and bullet list once, 
     # for optimization.
     Enum.each(state.players, fn({player_id, player}) ->
-      {:ok, json} = JSEX.encode(%{ state_update: %{ 
-        player_id: player_id,
-        public_id: player.public_id,
-        player_tank: Dict.get(tank_states, player, nil),             
-        bullet_list: bullets,
-        tanks: public_tank_states
-      }})
+      message_map  = %{ 
+        state_update: %{ 
+          player_id: player_id,
+          public_id: player.public_id,
+          player_tank: Dict.get(tank_states, player, nil),             
+          bullets: bullet_updates,
+          tanks: tank_updates
+        }
+      }        
+      {:ok, json} = JSEX.encode(message_map)
       send player.websocket_pid, { :update, json } 
     end)
 

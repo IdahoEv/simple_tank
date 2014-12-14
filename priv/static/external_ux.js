@@ -24,10 +24,18 @@ var ExternalUX = (function () {
   my.game_disconnected = function() {
     $('#game_connection').html('OFF'); 
   }
-  my.update_bullet_list = function(bullet_list) {
+  my.updateWorld = function(world_state) {
+    updateBulletList(world_state["bullets"]);
+    updateTankList(world_state["tanks"]);
+    updateTankState(world_state["player_tank"]);
+  }
+  function updateBulletList(bullet_list) {
     $('#bullet_count').html(bullet_list.length); 
   }
-  my.update_tank_state = function(tank_state) {
+  function updateTankList(tank_list) {
+    $('#tank_count').html(tank_list.length); 
+  }
+  function updateTankState(tank_state) {
     $('#tank_coords').html(my.round(tank_state.position.x) 
         + ", " 
         + my.round(tank_state.position.y)); 

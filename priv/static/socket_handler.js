@@ -77,18 +77,10 @@ var SocketHandler = (function(){
       ExternalUX.game_connected();
     }
     if ( message.state_update !== undefined) {
-      updateTankState(message["state_update"]["player_tank_physics"]);
-      updateBulletList(message["state_update"]["bullet_list"]);
+      GameWindow.updateWorld(message["state_update"]);
+      ExternalUX.updateWorld(message["state_update"]);
     }
   };  
-  function updateTankState(tank_state) {  
-    GameWindow.update_tank_state(tank_state);
-    ExternalUX.update_tank_state(tank_state);
-  }
-  function updateBulletList(bullet_list) {
-    GameWindow.update_bullet_list(bullet_list);
-    ExternalUX.update_bullet_list(bullet_list);
-  }
 
   function onError(evt) {
     ExternalUX.error(evt);
