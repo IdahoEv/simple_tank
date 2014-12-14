@@ -8,6 +8,7 @@ defmodule PublicStateFacts do
   alias SimpleTank.TankPhysics
   alias SimpleTank.Tank
   alias SimpleTank.Player
+  alias SimpleTank.Bullet
 
   def fixture_player(nn) do
     player = %Player{
@@ -44,8 +45,11 @@ defmodule PublicStateFacts do
       Dict.keys(state) |> contains("public_id_2")
       is_map(Dict.get(state, "public_id_1")) |> truthy
       is_map(Dict.get(state, "public_id_2")) |> truthy
+      Dict.get(state, "public_id_1").position.x |> equals 1.1
+      Dict.get(state, "public_id_2").position.y |> equals 2.2
     end
   end
+  
   facts "for player/tank" do
     
     fact "should include the proper contents" do
@@ -73,28 +77,34 @@ defmodule PublicStateFacts do
       end 
     end    
   end
+
+  
+  def fixture_bullet(nn) do
+     %Bullet{ 
+        id: "bullet_id_#{nn}",
+        fired: "fired_at_#{nn}",
+        last_updated: 1000000 + nn,
+        position: %{ x: (nn + 0.1), y: (nn + 0.2) },
+        rotation: nn + 0.3,
+        speed: nn + 0.4,
+        velocity: %{ x: nn + 0.6, y: nn + 0.7 }
+      }
+  end
+
   facts "for bullet" do
     alias SimpleTank.Bullet
     
     fact "should include the proper contents" do
-      bullet = %Bullet{ 
-            id: "id_1234",
-            fired: "aotuteuh",
-            last_updated: 1234,
-            position: %{ x: 123.4, y: 234.5},
-            velocity: %{ x: 0, y: 0},
-            speed: 8.0,
-            rotation: 1.75
-      }
+      bullet = fixture_bullet(1)
       
       { id, state } = PublicState.for_bullet(bullet)
       state |> !equals nil 
 
       # things the bullet state should have
-      id              |> equals "id_1234"
-      state.position  |> equals %{ x: 123.4, y: 234.5 }
-      state.rotation  |> equals 1.75
-      state.speed     |> equals 8.0
+      id              |> equals "bullet_id_1"
+      state.position  |> equals %{ x: 1.1, y: 1.2 }
+      state.rotation  |> equals 1.3
+      state.speed     |> equals 1.4
       state.angular_velocity |> equals 0.0  # fixed by API
       
       # things the public state shouldn't have
