@@ -1,4 +1,5 @@
 %{"amrita": {:git, "git://github.com/josephwilk/amrita.git", "bc28aeb2c773a71808dd814a9390758da1af744c", []},
+  "apex": {:hex, :apex, "0.3.2"},
   "cowboy": {:hex, :cowboy, "1.0.0"},
   "cowlib": {:hex, :cowlib, "1.0.0"},
   "dbg": {:hex, :dbg, "0.14.3"},

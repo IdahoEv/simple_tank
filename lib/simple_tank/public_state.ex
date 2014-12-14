@@ -2,6 +2,15 @@ defmodule SimpleTank.PublicState do
 
   alias SimpleTank.Tank
 
+  def tank_list(player_list) do
+    #IO.puts "\ntank_list called, argument is:"
+    #Apex.ap player_list
+
+    Enum.into(player_list, %{}, fn(player) -> 
+      for_tank(player) 
+    end)
+  end
+
   def for_tank(player) do
     tank_state = SimpleTank.Tank.get_state(player.tank_pid)    
     { player.public_id, 

@@ -25,13 +25,26 @@ defmodule PublicStateFacts do
           speed: nn + 0.4,
           angular_velocity: nn + 0.5
     }
-    tank = %Tank{ physics: tphys}
+    tank = %Tank{ physics: tphys }
   end 
 
 
   fact "for tank list" do
-    
+    pl1 = fixture_player(1)
+    pl2 = fixture_player(2) 
 
+    provided [ SimpleTank.Tank.get_state("tank_pid_1") |> fixture_tank(1),
+               SimpleTank.Tank.get_state("tank_pid_2") |> fixture_tank(2)
+    ] do
+      state = PublicState.tank_list([pl1, pl2])
+      state            |> !equals nil
+      is_map(state)    |> truthy
+      Dict.size(state) |> equals 2
+      Dict.keys(state) |> contains("public_id_1")
+      Dict.keys(state) |> contains("public_id_2")
+      is_map(Dict.get(state, "public_id_1")) |> truthy
+      is_map(Dict.get(state, "public_id_2")) |> truthy
+    end
   end
   facts "for player/tank" do
     

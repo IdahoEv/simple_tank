@@ -132,9 +132,9 @@ defmodule SimpleTank.Game do
     # Player struct, which is not public information. This will
     # not be directly returned to any player, but is used to construct
     # the items that will be.    
-    tank_states = Enum.into(state.players, %{}, fn({_player_id, player}) -> 
-      {player, PS.for_tank(player) } 
-    end)
+    #tank_states = Enum.into(state.players, %{}, fn({_player_id, player}) -> 
+      #{player, PS.for_tank(player) } 
+    #end)
 
     #IO.puts "Tank states: #{inspect(tank_states)}"
 
@@ -142,9 +142,7 @@ defmodule SimpleTank.Game do
     # instead of player.  It's done as a second step so that tank_states
     # can still be used as a fast way of pulling the current player's 
     # private state, without having to fetch it from the Tank server again. 
-    tank_updates = Enum.into(tank_states, %{}, fn({player, tank_state_with_id}) -> 
-      tank_state_with_id 
-    end)
+    tank_updates = PS.tank_list(state.players)
     IO.puts "tank_updates #{inspect(tank_updates)}"
     
     bullet_updates = Enum.into(state.bullet_list, %{}, fn(bullet) -> 
@@ -159,7 +157,7 @@ defmodule SimpleTank.Game do
         state_update: %{ 
           player_id: player_id,
           public_id: player.public_id,
-          player_tank: Dict.get(tank_states, player, nil),             
+          player_tank: "", #TODO: make private state converter. Was:  Dict.get(tank_states, player, nil),             
           bullets: bullet_updates,
           tanks: tank_updates
         }
