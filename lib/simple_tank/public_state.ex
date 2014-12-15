@@ -3,8 +3,6 @@ defmodule SimpleTank.PublicState do
   alias SimpleTank.Tank
 
   def tank_list(player_list) do
-    #IO.puts "\ntank_list called, argument is:"
-    #Apex.ap player_list
 
     Enum.into(player_list, %{}, fn(player) -> 
       for_tank(player) 

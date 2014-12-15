@@ -77,8 +77,8 @@ var SocketHandler = (function(){
       ExternalUX.game_connected();
     }
     if ( message.state_update !== undefined) {
-      GameWindow.updateWorld(message["state_update"]);
-      ExternalUX.updateWorld(message["state_update"]);
+      GameWindow.updateWorld(message.state_update);
+      ExternalUX.updateWorld(message.state_update);
     }
   };  
 

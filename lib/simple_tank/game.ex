@@ -123,44 +123,23 @@ defmodule SimpleTank.Game do
 
   # 
   def handle_info(:update_clients, state) do
-    #IO.puts("Updating #{Dict.size(state.players)} clients") 
     Process.send_after(self(), :update_clients, @client_update_interval)
-    alias SimpleTank.PublicState, as: PS 
+    alias SimpleTank.PublicState
 
-    # map the player list onto physics state of each tank
-    # We get a Dict of player -> tank state.  This is keyed by
-    # Player struct, which is not public information. This will
-    # not be directly returned to any player, but is used to construct
-    # the items that will be.    
-    #tank_states = Enum.into(state.players, %{}, fn({_player_id, player}) -> 
-      #{player, PS.for_tank(player) } 
-    #end)
-
-    #IO.puts "Tank states: #{inspect(tank_states)}"
-
-    # This makes the public-safe list of all tank states, keyed by name
-    # instead of player.  It's done as a second step so that tank_states
-    # can still be used as a fast way of pulling the current player's 
-    # private state, without having to fetch it from the Tank server again. 
-    tank_updates = PS.tank_list(state.players)
-    IO.puts "tank_updates #{inspect(tank_updates)}"
-    
-    bullet_updates = PS.bullet_list(state.bullet_list)
-    IO.puts "bullet_updates #{inspect(bullet_updates)}"
+    tank_updates   = PublicState.tank_list(Dict.values(state.players))
+    bullet_updates = PublicState.bullet_list(state.bullet_list)
 
     # TODO: only do the JSON conversion of tanks and bullet list once, 
-    # for optimization.
+    # for optimization?
     Enum.each(state.players, fn({player_id, player}) ->
-      message_map  = %{ 
+      {:ok, json} = JSEX.encode %{ 
         state_update: %{ 
           player_id: player_id,
-          public_id: player.public_id,
           player_tank: SimpleTank.PrivateTankState.for_tank(player),
           bullets: bullet_updates,
           tanks: tank_updates
         }
       }        
-      {:ok, json} = JSEX.encode(message_map)
       send player.websocket_pid, { :update, json } 
     end)
 

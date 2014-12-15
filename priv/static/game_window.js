@@ -13,6 +13,18 @@ var GameWindow = (function () {
 
   var imageObj = new Image();
 
+  Array.prototype.diff = function(a) {
+      return this.filter(function(i) {return a.indexOf(i) < 0;});
+  };
+
+  function intersect(a, b) {
+    var t;
+    if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
+    return a.filter(function (e) {
+        if (b.indexOf(e) !== -1) return true;
+    });
+  }
+
   function preload() {
     game.load.image('tank', '/static/images/tank-32.png');
     game.load.image('shell', '/static/images/shell-32.png');
@@ -41,14 +53,15 @@ var GameWindow = (function () {
     coords = worldPoint2ScreenCoords(state.position);
     var new_sprite = game.add.sprite(coords.x, coords.y, sprite_name);
     game.physics.enable(new_sprite, Phaser.Physics.ARCADE);
-    new_sprite.anchor.setTo('0.5', '0.5')
-    updatePhysicsFromState(new_sprite, state);
-    new_sprites[id] = new_sprite
+    new_sprite.anchor.setTo('0.5', '0.5');
+    updateSpriteState(new_sprite, state);
+    sprite_list[id] = new_sprite;
   }
   function newTankSprite(tank_id, tank_state) {
     makeSpriteFromState( tank_sprites, tank_id, tank_state, 'tank');
   }
   function newBulletSprite(bullet_id, bullet_state) {
+    console.log ("Making sprite from id", bullet_id);
     makeSpriteFromState( bullet_sprites, bullet_id, bullet_state, 'shell');
   }
   function makePlayerTankSprite() {
@@ -192,16 +205,16 @@ var GameWindow = (function () {
           update: update });
   }
 
-  my.updateWorldState = function(world_state) {
+  my.updateWorld = function(world_state) {
     if (my.tank == undefined) {
       makePlayerTankSprite(world_state.player_tank);
     }
-    var player_public_id = world_state.player_tank.public_id;
+    var player_public_id = world_state.player_tank.id;
 
-    updatePhysicsFromState(my.tank, world_state.player_tank);
+    updateSpriteState(my.tank, world_state.player_tank);
     updateAndFilter(bullet_sprites, world_state.bullets, newBulletSprite);
-    world_state.tanks.delete[public_id];  // don't show self tank in other sprites list
-    updateAndFilter(tank_sprites,   world_state.tanks, newBulletSprite);   
+    delete world_state.tanks[player_public_id];  // don't show self tank in other sprites list
+    updateAndFilter(tank_sprites,   world_state.tanks, newTankSprite);   
   }
 
   // A cheat to improve the smoothness of apparent steering, remove the
