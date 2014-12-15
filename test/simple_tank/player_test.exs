@@ -1,4 +1,4 @@
-Code.require_file "../test_helper.exs", __ENV__.file
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule PlayerFacts do
   use Amrita.Sweet

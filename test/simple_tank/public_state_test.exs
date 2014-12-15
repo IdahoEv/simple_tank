@@ -1,5 +1,5 @@
 
-Code.require_file "../test_helper.exs", __ENV__.file
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule PublicStateFacts do
   use Amrita.Sweet
@@ -11,7 +11,7 @@ defmodule PublicStateFacts do
   alias SimpleTank.Bullet
 
   def fixture_player(nn) do
-    player = %Player{
+    %Player{
       player_id:     "player_id_#{nn}",  
       public_id:     "public_id_#{nn}",
       name:          "player_name_#{nn}", 
@@ -26,7 +26,7 @@ defmodule PublicStateFacts do
           speed: nn + 0.4,
           angular_velocity: nn + 0.5
     }
-    tank = %Tank{ physics: tphys }
+    %Tank{ physics: tphys }
   end 
 
 

@@ -1,12 +1,12 @@
 
-Code.require_file "../test_helper.exs", __ENV__.file
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule ClientUpdateFacts do
   use Amrita.Sweet
 
-  alias SimpleTank.ClientUpdate
+  #alias SimpleTank.ClientUpdate
   alias SimpleTank.Tank
-  alias SimpleTank.TankPhysics
+  #alias SimpleTank.TankPhysics
   alias SimpleTank.Player
 
   defmodule Fixture do
