@@ -28,6 +28,7 @@ var GameWindow = (function () {
   function preload() {
     game.load.image('tank', '/static/images/tank-32.png');
     game.load.image('shell', '/static/images/shell-32.png');
+    game.stage.disableVisibilityChange = true;
   }
  
   function create() {
