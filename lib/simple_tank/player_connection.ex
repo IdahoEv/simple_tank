@@ -27,9 +27,9 @@ defmodule SimpleTank.PlayerConnection do
     end
   end
 
-  # Player attempts reconnect via player_id
-  def connect(player_id, player_name, nil) do
-    player = case  SimpleTank.Game.reconnect_player(:game, player_id, self()) do
+  # Player attempts reconnect via private_id
+  def connect(private_id, player_name, nil) do
+    player = case  SimpleTank.Game.reconnect_player(:game, private_id, self()) do
       { :ok, player } -> 
         player
       { :not_found }  -> 
@@ -44,7 +44,7 @@ defmodule SimpleTank.PlayerConnection do
   end
 
   def player_reply_with_state(player) do
-    { :ok, reply } = JSEX.encode(%{ player_id: player.player_id, public_id: player.public_id })
+    { :ok, reply } = JSEX.encode(%{ private_id: player.private_id, id: player.id })
     { { :text, reply }, player }
   end
   

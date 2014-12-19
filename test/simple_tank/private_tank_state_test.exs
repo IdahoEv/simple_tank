@@ -11,8 +11,8 @@ defmodule PrivateTankStateFacts do
 
   def fixture_player(nn) do
     %Player{
-      player_id:     "player_id_#{nn}",  
-      public_id:     "public_id_#{nn}",
+      private_id:    "private_id_#{nn}",  
+      id:            "id_#{nn}",
       name:          "player_name_#{nn}", 
       tank_pid:      "tank_pid_#{nn}",
       websocket_pid: "websocket_pid_#{nn}"
@@ -35,7 +35,7 @@ defmodule PrivateTankStateFacts do
       state |> !equals nil 
 
       # things the state should have
-      state.id        |> equals "public_id_1"
+      state.id        |> equals "id_1"
       state.name      |> equals "player_name_1"
       state.position  |> equals %{ x: 1.1, y: 1.2 }
       state.rotation  |> equals 1.3
@@ -43,7 +43,7 @@ defmodule PrivateTankStateFacts do
       state.angular_velocity |> equals 1.5
       
       # things the public state shouldn't have
-      Dict.get(state, :public_id) |> equals nil  # is renamed just 'id' for API purposes
+      Dict.get(state, :private_id) |> equals nil
       Dict.get(state, :velocity)  |> equals nil
       Dict.get(state, :tank_pid)  |> equals nil
       Dict.get(state, :game_pid)  |> equals nil

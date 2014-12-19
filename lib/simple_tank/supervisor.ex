@@ -22,14 +22,14 @@ defmodule SimpleTank.Supervisor do
     supervise(children, strategy: :one_for_one)
   end
 
-  def add_tank(player_id) do
-    spec = _tank_spec(player_id)
+  def add_tank(id) do
+    spec = _tank_spec(id)
     IO.puts "Worker spec: #{inspect(spec)}"
     { :ok, tank_pid } =  Supervisor.start_child(@my_pid, spec)
   end
 
-  defp _tank_spec(player_id) do
-    name = :"tank_#{player_id}"
+  defp _tank_spec(id) do
+    name = :"tank_#{id}"
     { name,
       { SimpleTank.Tank, 
         :start_link,

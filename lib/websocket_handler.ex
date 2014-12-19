@@ -23,7 +23,7 @@ defmodule WebsocketHandler do
     {:ok, req, state}
   end
  
-  # connect requests should come with either "new" or a player_id.
+  # connect requests should come with either "new" or a private_id.
   def handle_message(%{ "connect" => command, "name" => player_name }, req, state) do
     case SimpleTank.PlayerConnection.connect(command, player_name, state) do
       { :error, _ }         -> { :shutdown, req, state}

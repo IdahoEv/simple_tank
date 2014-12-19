@@ -72,7 +72,7 @@ var SocketHandler = (function(){
   function onMessage(evt) { 
     message = JSON.parse(evt.data);
     ExternalUX.message_received(evt.data);
-    if (message.player_id !== undefined) {
+    if (message.private_id !== undefined) {
       // TODO save player id
       ExternalUX.game_connected();
     }

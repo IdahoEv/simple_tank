@@ -111,49 +111,12 @@ var GameWindow = (function () {
     delete sprite_list[sprite_id];
   }
 
-  //function updateBullets() {
-    //var existing_sprite_ids = Object.keys(bullet_sprites);
-    //var bullet_sprite;
-
-    //// Make sure all listed bullets are updated or created
-    //for (var bn = 0; bn < bullet_list.length; bn++) {
-      //var bullet = bullet_list[bn];
-
-      //// if the sprites array already contains this bullet, update it
-      //if (existing_sprite_ids.indexOf(bullet.id.toString()) > -1) {
-
-        //bullet_sprite = bullet_sprites[bullet.id];
-        //updatePhysicsFromState(bullet_sprite, bullet);
-        ////debugSpriteState (bullet_sprite, "bullet_sprite_"+bullet.id);
-        ////debugPhysicsState(bullet,        "bullet_state_"+bullet.id);
-        //existing_sprite_ids.splice(
-          //existing_sprite_ids.indexOf(bullet.id.toString()),1
-        //)
-      //// otherwise make a new sprite  
-      //} else { 
-        //console.log('creating new sprite');
-        //makeBulletSprite(bullet); 
-      //}
-    //}
-
-    //// remove any bullet sprites that do not exist in the server update
-    //for (var sin = 0; sin < existing_sprite_ids.length; sin++) {
-
-      //sid = existing_sprite_ids[sin];
-      //console.log('deleting sprite with id '+ sid);
-      //bullet_sprite = bullet_sprites[sid];
-      //bullet_sprite.kill;
-      //bullet_sprite.parent.removeChild(bullet_sprite);
-      //delete bullet_sprites[sid];
-    //}
-  //}
-
-  function coordPairString(coords) {
-    return "(" 
-      + ExternalUX.round(coords.x) 
-      + ", " 
-      + ExternalUX.round(coords.y) 
-      + ")"
+    function coordPairString(coords) {
+    //return "(" 
+      //+ ExternalUX.round(coords.x) 
+      //+ ", " 
+      //+ ExternalUX.round(coords.y) 
+      //+ ")"
   }
 
 

@@ -6,7 +6,7 @@ defmodule SimpleTank.Game do
   @world_update_interval 20   # update physics & game state 50 Hz
   @client_update_interval 100 # update period to client
   
-  defstruct  players: %{},  # map keyed by player_id
+  defstruct  players: %{},  # map keyed by id
              last_updated: SimpleTank.Time.now,
              bullet_list: [] 
 
@@ -30,12 +30,12 @@ defmodule SimpleTank.Game do
 
   # Connect a player and new websocket to his existing tank
   # Player_args should be a tuple like
-  #   { <player_id>, <websocket_pid> }
+  #   { <private_id>, <websocket_pid> }
   # Returns one of
   #   { :ok, <Player> }
   #   { :not_found }
-  def reconnect_player(_pid, player_id, websocket_pid) do
-    GenServer.call @my_pid, { :reconnect_player, { player_id, websocket_pid} } 
+  def reconnect_player(_pid, private_id, websocket_pid) do
+    GenServer.call @my_pid, { :reconnect_player, { private_id, websocket_pid} } 
   end
 
   def add_bullet(firing_tank) do
@@ -59,24 +59,24 @@ defmodule SimpleTank.Game do
   def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do
     #IO.puts("In add player call handler, state is #{inspect(state)}")
     player  = SimpleTank.Player.new(name, websocket_pid)
-    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player.player_id)
+    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player.private_id)
     player  = %SimpleTank.Player{ player | tank_pid: tank_pid} 
 
     { :reply,      
       { :ok, player }, 
-      %{ state | players: Dict.put(state.players, player.player_id, player) }
+      %{ state | players: Dict.put(state.players, player.id, player) }
     }
   end
 
-  def handle_call({ :reconnect_player, { player_id, websocket_pid}}, _from, state) do
-    case state.players[player_id] do
+  def handle_call({ :reconnect_player, { private_id, websocket_pid}}, _from, state) do
+    case state.players[private_id] do
       # connect as a new player?
       nil -> { :reply, { :not_found }, state }
       player -> 
         player = %SimpleTank.Player{ player | websocket_pid: websocket_pid }
         { :reply,
           { :ok, player },
-          %{ state | players: Dict.put(state.players, player.player_id, player) }
+          %{ state | players: Dict.put(state.players, player.private_id, player) }
         }      
     end
   end
@@ -131,10 +131,10 @@ defmodule SimpleTank.Game do
 
     # TODO: only do the JSON conversion of tanks and bullet list once, 
     # for optimization?
-    Enum.each(state.players, fn({player_id, player}) ->
+    Enum.each(state.players, fn({id, player}) ->
       {:ok, json} = JSEX.encode %{ 
         state_update: %{ 
-          player_id: player_id,
+          private_id: player.private_id,
           player_tank: SimpleTank.PrivateTankState.for_tank(player),
           bullets: bullet_updates,
           tanks: tank_updates

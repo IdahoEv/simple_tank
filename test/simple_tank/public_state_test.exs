@@ -12,8 +12,8 @@ defmodule PublicStateFacts do
 
   def fixture_player(nn) do
     %Player{
-      player_id:     "player_id_#{nn}",  
-      public_id:     "public_id_#{nn}",
+      private_id:    "private_id_#{nn}",  
+      id:            "id_#{nn}",
       name:          "player_name_#{nn}", 
       tank_pid:      "tank_pid_#{nn}",
       websocket_pid: "websocket_pid_#{nn}"
@@ -41,12 +41,12 @@ defmodule PublicStateFacts do
       state            |> !equals nil
       is_map(state)    |> truthy
       Dict.size(state) |> equals 2
-      Dict.keys(state) |> contains("public_id_1")
-      Dict.keys(state) |> contains("public_id_2")
-      is_map(Dict.get(state, "public_id_1")) |> truthy
-      is_map(Dict.get(state, "public_id_2")) |> truthy
-      Dict.get(state, "public_id_1").position.x |> equals 1.1
-      Dict.get(state, "public_id_2").position.y |> equals 2.2
+      Dict.keys(state) |> contains("id_1")
+      Dict.keys(state) |> contains("id_2")
+      is_map(Dict.get(state, "id_1")) |> truthy
+      is_map(Dict.get(state, "id_2")) |> truthy
+      Dict.get(state, "id_1").position.x |> equals 1.1
+      Dict.get(state, "id_2").position.y |> equals 2.2
     end
   end
   
@@ -60,7 +60,7 @@ defmodule PublicStateFacts do
         state |> !equals nil 
 
         # things the state should have
-        id              |> equals "public_id_1"
+        id              |> equals "id_1"
         state.name      |> equals "player_name_1"
         state.position  |> equals %{ x: 1.1, y: 1.2 }
         state.rotation  |> equals 1.3
@@ -68,8 +68,8 @@ defmodule PublicStateFacts do
         state.angular_velocity |> equals 1.5
         
         # things the public state shouldn't have
-        Dict.get(state, :player_id) |> equals nil
-        Dict.get(state, :public_id) |> equals nil  # is renamed just 'id' for API purposes
+        Dict.get(state, :private_id) |> equals nil
+        Dict.get(state, :id) |> equals nil  # is renamed just 'id' for API purposes
         Dict.get(state, :velocity)  |> equals nil
         Dict.get(state, :tank_pid)  |> equals nil
         Dict.get(state, :game_pid)  |> equals nil
@@ -124,7 +124,7 @@ defmodule PublicStateFacts do
       state.angular_velocity |> equals 0.0  # fixed by API
       
       # things the public state shouldn't have
-      Dict.get(state, :public_id) |> equals nil
+      Dict.get(state, :id) |> equals nil
       Dict.get(state, :name)      |> equals nil
       Dict.get(state, :fired)     |> equals nil
       Dict.get(state, :velocity)  |> equals nil

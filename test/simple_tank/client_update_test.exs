@@ -20,7 +20,8 @@ defmodule ClientUpdateFacts do
     end
 
     def player(nn) do
-      %Player{ player_id:     player_id(nn),
+      %Player{ id:             "id_#{nn}",
+               private_id:     private_id(nn),               
                name:          :"name_#{nn}", 
                tank_pid:      :"tank_pid_#{nn}",
                game_pid:      :game,
@@ -28,8 +29,8 @@ defmodule ClientUpdateFacts do
              }
     end
 
-    def player_id(nn) do
-      "player_id_#{nn}"
+    def private_id(nn) do
+      "private_id_#{nn}"
     end
   end
 
