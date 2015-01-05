@@ -12,7 +12,7 @@ defmodule Collider.ListCollider do
     end
   end
 
-  def hit?(:no_collision), do: nil
   def hit?({:collision, vector}), do: vector
+  def hit?(_),                    do: false
 end
 

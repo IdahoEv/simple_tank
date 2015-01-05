@@ -25,8 +25,8 @@ defmodule PlayerListFacts do
 
     list = PlayerList.store(list, pl1)
     list = PlayerList.store(list, pl2)
-    PlayerList.retrieve(list, pl1.id)  |> equals {:ok, pl1}
-    PlayerList.retrieve(list, pl2.id)  |> equals {:ok, pl2}
+    PlayerList.retrieve(list, pl1.id)  |> equals {:ok, ^pl1}
+    PlayerList.retrieve(list, pl2.id)  |> equals {:ok, ^pl2}
   end
 
   fact "should be able to store and retrieve players by private id" do    
@@ -37,8 +37,8 @@ defmodule PlayerListFacts do
 
     list = PlayerList.store(list, pl1)
     list = PlayerList.store(list, pl2)
-    PlayerList.retrieve(list, {:private_id, pl2.private_id}) |> equals {:ok, pl2}
-    PlayerList.retrieve(list, {:private_id, pl1.private_id}) |> equals {:ok, pl1}
+    PlayerList.retrieve(list, {:private_id, pl2.private_id}) |> equals {:ok, ^pl2}
+    PlayerList.retrieve(list, {:private_id, pl1.private_id}) |> equals {:ok, ^pl1}
   end
 
   fact "should return :not_found when asked for a non-stored player" do

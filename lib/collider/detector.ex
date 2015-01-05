@@ -9,7 +9,7 @@ defmodule Collider.Detector do
       dist <= maxdist ->
         { :collision, vector_between(c1, c2) }
       true ->
-        :no_collision
+        false
     end
   end
  
