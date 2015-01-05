@@ -6,10 +6,11 @@ defmodule SimpleTank.Game do
   @world_update_interval 20   # update physics & game state 50 Hz
   @client_update_interval 100 # update period to client
   
-  defstruct  players: %{},  # map keyed by id
+  defstruct  players: SimpleTank.PlayerList.new,  # map keyed by id
              last_updated: SimpleTank.Time.now,
              bullet_list: [] 
 
+  alias SimpleTank.PlayerList
 
   def start_link() do
     IO.puts "registering game server"
@@ -64,7 +65,7 @@ defmodule SimpleTank.Game do
 
     { :reply,      
       { :ok, player }, 
-      %{ state | players: Dict.put(state.players, player.id, player) }
+      %{ state | players: PlayerList.store(state.players, player) }
     }
   end
 
@@ -76,7 +77,7 @@ defmodule SimpleTank.Game do
         player = %SimpleTank.Player{ player | websocket_pid: websocket_pid }
         { :reply,
           { :ok, player },
-          %{ state | players: Dict.put(state.players, player.private_id, player) }
+          %{ state | players: PlayerList.store(state.players, player) }
         }      
     end
   end

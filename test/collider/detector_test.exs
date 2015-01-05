@@ -23,8 +23,8 @@ defmodule ColliderDetectorFacts do
     end
     fact "Can detect misses in the SE quadrant " do
       c1 = Fixture.circle(1.0,1.0,0.5)
-      Detector.collision?(c1, Fixture.circle(2.0,2.0,0.5))   |> { :no_collision, _ } 
-      Detector.collision?(c1, Fixture.circle(2.0,1.0,0.125)) |> { :no_collision, _ } 
+      Detector.collision?(c1, Fixture.circle(2.0,2.0,0.5))   |> :no_collision
+      Detector.collision?(c1, Fixture.circle(2.0,1.0,0.125)) |> :no_collision
     end
     fact "Can detect collisions in the NE quadrant" do
       c1 = Fixture.circle(2.0,-1.5,0.25)
@@ -35,8 +35,8 @@ defmodule ColliderDetectorFacts do
     end
     fact "Can detect misses in the NE quadrant " do
       c1 = Fixture.circle(2.0,-1.5,0.25)
-      Detector.collision?(c1, Fixture.circle(2.0,-2.0,0.1)) |> { :no_collision, _ } 
-      Detector.collision?(c1, Fixture.circle(2.5,-0.5,0.5)) |> { :no_collision, _ } 
+      Detector.collision?(c1, Fixture.circle(2.0,-2.0,0.1)) |> :no_collision
+      Detector.collision?(c1, Fixture.circle(2.5,-0.5,0.5)) |> :no_collision
     end
   end
 end

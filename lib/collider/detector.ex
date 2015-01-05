@@ -7,10 +7,14 @@ defmodule Collider.Detector do
     dist = :math.sqrt( dx * dx + dy * dy )
     cond do 
       dist <= maxdist ->
-        # TODO: return the vector of the collision as the 2nd argument
-        { :collision, nil }
+        { :collision, vector_between(c1, c2) }
       true ->
-        { :no_collision, nil }  
+        :no_collision
     end
+  end
+ 
+  def vector_between(c1, c2) do
+    %{ x: c1.position.x - c2.position.x,
+       y: c1.position.y - c2.position.y }
   end
 end
