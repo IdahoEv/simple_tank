@@ -91,7 +91,11 @@ defmodule SimpleTank.TankPhysics do
     raise "Unhandled accel call"
     System.halt
   end
-
+ 
+  # TODO: change this to a rectangle
+  def geometry(tank_physics) do
+    { :circle, %{ position: tank_physics.position, radius: 0.5} }
+  end
 
   
 end  

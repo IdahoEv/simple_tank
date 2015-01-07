@@ -60,7 +60,7 @@ defmodule SimpleTank.Game do
   def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do
     #IO.puts("In add player call handler, state is #{inspect(state)}")
     player  = SimpleTank.Player.new(name, websocket_pid)
-    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player.private_id)
+    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player)
     player  = %SimpleTank.Player{ player | tank_pid: tank_pid} 
 
     { :reply,      
@@ -90,13 +90,15 @@ defmodule SimpleTank.Game do
     { :stop, "Unhandled call in Game: #{inspect(msg)}", state }
   end
 
-  def handle_cast( {:add_bullet, firing_tank}, state ) do    
+  def handle_cast( {:add_bullet, firing_tank}, state ) do
     { :noreply, 
       %{ state | bullet_list: 
                  SimpleTank.BulletList.add_bullet(
                     state.bullet_list, 
                     firing_tank.physics.position, 
-                    firing_tank.physics.rotation)
+                    firing_tank.physics.rotation,
+                    firing_tank.player_id 
+                    )
        } 
     }
   end  
@@ -115,11 +117,36 @@ defmodule SimpleTank.Game do
     
     # queue up another update a few milliseconds from now
     Process.send_after(self(), :update_world, @world_update_interval)
-    bullet_list = SimpleTank.BulletList.update(state.bullet_list)    
+    alias SimpleTank.TankPhysics
+    alias SimpleTank.Bullet
+    alias SimpleTank.Tank
 
-    # TODO: tell every tank to update? or let tanks self-update?    
-    
-    { :noreply, %{ state | bullet_list: bullet_list}}
+    bullet_list = SimpleTank.BulletList.update(state.bullet_list) 
+
+    # make lists of bullet & tank geometries
+    bullet_geometry_list = Enum.map(bullet_list, 
+      fn(bullet) -> { bullet, Bullet.geometry(bullet)}
+    end)
+    tank_geometry_list = Enum.map(Dict.values(state.players), 
+      fn(player) -> { player, TankPhysics.geometry(Tank.get_state(player.tank_pid).physics) }
+    end)
+
+    # check for collisions
+    collisions = Collider.ListCollider.find_hits(bullet_geometry_list, tank_geometry_list)
+    hit_bullets = []
+    hit_bullets = Enum.filter_map(collisions, 
+      fn({bullet, player, _}) -> 
+        if bullet.player_id != player.id do
+          IO.puts "Hit on #{player.name}!"            
+        end
+        bullet.player_id != player.id
+      end,
+      fn({bullet, player, _}) -> 
+        bullet
+      end
+    )    
+    # TODO: tell every tank to update? or let tanks self-update?     
+    { :noreply, %{ state | bullet_list: (bullet_list -- hit_bullets)}}
   end
 
   # 

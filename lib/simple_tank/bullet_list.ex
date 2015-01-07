@@ -7,8 +7,8 @@ defmodule SimpleTank.BulletList do
     )
   end
   
-  def add_bullet(bullet_list, position, angle) do
-    [ SimpleTank.Bullet.new(position, angle) | bullet_list ]
+  def add_bullet(bullet_list, position, angle, player_id) do
+    [ SimpleTank.Bullet.new(position, angle, player_id) | bullet_list ]
   end
 
 end

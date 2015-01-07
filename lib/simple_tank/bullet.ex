@@ -1,5 +1,6 @@
 defmodule SimpleTank.Bullet do
   defstruct id: nil,
+            player_id: nil,
             fired: 0,
             last_updated: 0,
             position: %{ x: 0, y: 0},
@@ -9,11 +10,13 @@ defmodule SimpleTank.Bullet do
 
   @speed    10.0  # units/sec
   @lifetime 2.0   # sec
+  @radius   0.1
 
-  def new(position, rotation) do
+  def new(position, rotation, player_id) do
     now = SimpleTank.Time.now
     %SimpleTank.Bullet{ 
        id: SimpleTank.Time.uniq_nanosec,
+       player_id: player_id,
        fired: now,
        last_updated: now,
        position: position,
@@ -49,4 +52,8 @@ defmodule SimpleTank.Bullet do
        y: :math.sin(rotation) * speed  
     }    
   end  
+
+  def geometry(bullet) do
+    { :circle, %{ position: bullet.position, radius: @radius } }
+  end
 end

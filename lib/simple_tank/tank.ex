@@ -6,12 +6,13 @@ defmodule SimpleTank.Tank do
   defstruct  physics: %SimpleTank.TankPhysics{},
              control_state: %SimpleTank.TankControlState{},
              name: :"",
+             player_id: nil,
              last_fired: 0
 
 
-  def start_link(name) do
+  def start_link(name, player_id) do
     IO.puts "registering tank #{inspect(name)}"
-    GenServer.start_link __MODULE__, %SimpleTank.Tank{ name: name }
+    GenServer.start_link __MODULE__, %SimpleTank.Tank{ name: name, player_id: player_id }
   end
 
   # Public API
