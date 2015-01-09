@@ -1,7 +1,5 @@
 defmodule SimpleTank.PrivateTankState do
 
-  alias SimpleTank.Tank
-
   def for_tank(player) do
     tank_state = SimpleTank.Tank.get_state(player.tank_pid)    
     %{ id:        player.id, 
