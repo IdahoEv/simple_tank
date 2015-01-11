@@ -1,7 +1,5 @@
 defmodule SimpleTank.PublicState do
 
-  alias SimpleTank.Tank
-
   def tank_list(player_list) do
 
     Enum.into(player_list, %{}, fn(player) -> 

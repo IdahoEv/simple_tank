@@ -10,7 +10,7 @@ defmodule SimpleTank.ClientUpdate do
 
     # TODO: only do the JSON conversion of tanks and bullet list once, 
     # for optimization?
-    Enum.each(state.players, fn({id, player}) ->
+    Enum.each(state.players, fn({_id, player}) ->
       {:ok, json} = JSEX.encode %{ 
         state_update: %{ 
           private_id: player.private_id,

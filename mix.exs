@@ -7,7 +7,7 @@ defmodule SimpleTank.Mixfile do
      elixir: "~> 1.0.0",
      deps: deps,
      test_coverage: [tool: Coverex.Task]
-   ]
+   ] 
   end
 
   # Configuration for the OTP application

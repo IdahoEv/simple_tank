@@ -4,16 +4,8 @@ defmodule SimpleTank.Supervisor do
   @my_pid :supervisor
 
   def start_link(_) do
-    result = {:ok, sup} = Supervisor.start_link(__MODULE__, [], name: @my_pid)
-    result
+    {:ok, _supervisor} = Supervisor.start_link(__MODULE__, [], name: @my_pid)
   end
-
-  #def start_workers(sup) do
-    ## TODO: move bullet list into Game state, instead of separate server
-    ## TODO 2: proper supervision tree with one for the game and one for the tanks
-    #{ :ok, bullet_list } = 
-       #Supervisor.start_child(sup, worker(SimpleTank.BulletList, []))
-  #end
 
   def init(_) do
     children = [
@@ -25,7 +17,7 @@ defmodule SimpleTank.Supervisor do
   def add_tank(player) do
     spec = _tank_spec(player)
     IO.puts "Worker spec: #{inspect(spec)}"
-    { :ok, tank_pid } =  Supervisor.start_child(@my_pid, spec)
+    { :ok, _tank_pid } =  Supervisor.start_child(@my_pid, spec)
   end
 
   defp _tank_spec(player) do
@@ -39,7 +31,7 @@ defmodule SimpleTank.Supervisor do
       5000,
       :worker,
       [ SimpleTank.Tank ]
-    }
+    } 
   end
 end
 

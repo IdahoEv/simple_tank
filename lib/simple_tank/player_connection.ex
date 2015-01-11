@@ -16,7 +16,7 @@ defmodule SimpleTank.PlayerConnection do
   end
 
   # Player calls 'new' or 'reconnect' but already has associated tank, the state contained a player
-  def connect(_, player_name, %Player{} = player) do
+  def connect(_, _player_name, %Player{} = player) do
     case { :erlang.is_process_alive(player.tank_pid),  self() == player.websocket_pid() } do
       { true, true } ->  
         IO.puts "Player is already connected, refusing new connection"
@@ -34,6 +34,7 @@ defmodule SimpleTank.PlayerConnection do
         player
       { :not_found }  -> 
         { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self() )      
+        player
     end
     SimpleTank.Debug.print_player_registry(self())
     player_reply_with_state(player)
