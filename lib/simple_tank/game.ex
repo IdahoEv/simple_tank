@@ -91,16 +91,7 @@ defmodule SimpleTank.Game do
   end
 
   def handle_cast( {:add_bullet, firing_tank}, state ) do
-    { :noreply, 
-      %{ state | bullet_list: 
-                 SimpleTank.BulletList.add_bullet(
-                    state.bullet_list, 
-                    firing_tank.physics.position, 
-                    firing_tank.physics.rotation,
-                    firing_tank.player_id 
-                    )
-       } 
-    }
+    { :noreply, SimpleTank.BulletList.add_bullet(state, firing_tank) }
   end  
 
   def handle_cast(msg, state) do
@@ -117,28 +108,11 @@ defmodule SimpleTank.Game do
     { :noreply, SimpleTank.GameUpdate.update(state) }
   end
 
-  # 
+  # Loop that sends game & tank state info to each connected client
+  # over their websocket.
   def handle_info(:update_clients, state) do
     Process.send_after(self(), :update_clients, @client_update_interval)
-    alias SimpleTank.PublicState
-
-    tank_updates   = PublicState.tank_list(Dict.values(state.players))
-    bullet_updates = PublicState.bullet_list(state.bullet_list)
-
-    # TODO: only do the JSON conversion of tanks and bullet list once, 
-    # for optimization?
-    Enum.each(state.players, fn({id, player}) ->
-      {:ok, json} = JSEX.encode %{ 
-        state_update: %{ 
-          private_id: player.private_id,
-          player_tank: SimpleTank.PrivateTankState.for_tank(player),
-          bullets: bullet_updates,
-          tanks: tank_updates
-        }
-      }        
-      send player.websocket_pid, { :update, json } 
-    end)
-
+    SimpleTank.ClientUpdate.send(state)
     { :noreply, state }
   end
 

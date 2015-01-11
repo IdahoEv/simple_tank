@@ -7,8 +7,13 @@ defmodule SimpleTank.BulletList do
     )
   end
   
-  def add_bullet(bullet_list, position, angle, player_id) do
-    [ SimpleTank.Bullet.new(position, angle, player_id) | bullet_list ]
+  def add_bullet(game_state, firing_tank) do
+    bullet = SimpleTank.Bullet.new(
+      firing_tank.physics.position, 
+      firing_tank.physics.rotation,
+      firing_tank.player_id 
+    )
+    %SimpleTank.Game{ game_state | bullet_list: [ bullet | game_state.bullet_list ] }         
   end
 
 end
