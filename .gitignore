@@ -4,3 +4,5 @@ erl_crash.dump
 *.ez
 *.sw?
 *.log
+.DS_Store
+cover/*

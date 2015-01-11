@@ -5,7 +5,9 @@ defmodule SimpleTank.Mixfile do
     [app: :simple_tank,
      version: "0.0.1",
      elixir: "~> 1.0.0",
-     deps: deps]
+     deps: deps,
+     test_coverage: [tool: Coverex.Task]
+   ]
   end
 
   # Configuration for the OTP application
@@ -14,8 +16,7 @@ defmodule SimpleTank.Mixfile do
   def application do
     [ 
       mod: { SimpleTank, []},
-      applications: [ :cowboy, :ranch, 
-        #:dbg
+      applications: [ :cowboy, :ranch, #:dbg
       ]
     ]
   end
@@ -34,7 +35,8 @@ defmodule SimpleTank.Mixfile do
       { :jsex, "~> 2.0.0" }, 
       { :uuid, "~> 0.1.5" },
       { :amrita, "~> 0.4", github: "josephwilk/amrita" },
-      { :apex, "~> 0.3.2 "}
+      { :apex, "~> 0.3.2 "},
+      { :coverex, "~> 1.0.0", only: :test }
 
       #{ :dbg, "~> 0.14.3" }
     ]
