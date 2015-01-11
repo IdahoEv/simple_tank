@@ -7,12 +7,13 @@ defmodule SimpleTank.Tank do
              control_state: %SimpleTank.TankControlState{},
              name: :"",
              player_id: nil,
-             last_fired: 0
+             last_fired: 0,
+             game_pid: nil
 
 
-  def start_link(name, player_id) do
+  def start_link(name, player_id, game_pid) do
     IO.puts "registering tank #{inspect(name)}"
-    GenServer.start_link __MODULE__, %SimpleTank.Tank{ name: name, player_id: player_id }
+    GenServer.start_link __MODULE__, %SimpleTank.Tank{ name: name, player_id: player_id, game_pid: game_pid }
   end
 
   # Public API
@@ -41,7 +42,7 @@ defmodule SimpleTank.Tank do
 
   def handle_cast( :fire, tank) do
     #IO.puts "New bullet at #{tank.physics.position.x} #{tank.physics.position.y}"
-    SimpleTank.Game.add_bullet(tank)
+    SimpleTank.Game.add_bullet(tank.game_pid, tank)
     { :noreply, %{ tank | last_fired: SimpleTank.Time.now } }
   end
 

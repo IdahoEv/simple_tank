@@ -1,7 +1,7 @@
 defmodule SimpleTank.Game do
   use GenServer
 
-  @my_pid :game
+  @my_pid :game  #TODO support multiple games, eliminate @my_pid
 
   @world_update_interval 20   # update physics & game state 50 Hz
   @client_update_interval 100 # update period to client
@@ -16,7 +16,7 @@ defmodule SimpleTank.Game do
     IO.puts "registering game server"
     GenServer.start_link __MODULE__, 
       %SimpleTank.Game{},
-      name: @my_pid
+      name: @my_pid  #TODO support multiple games, eliminate @my_pid
   end
 
              
@@ -26,6 +26,7 @@ defmodule SimpleTank.Game do
   # Returns
   #   { :ok, <Player> }
   def add_player(_pid, name, websocket_pid) do
+    #TODO support multiple games, eliminate @my_pid 
     GenServer.call @my_pid, { :add_player, { name, websocket_pid } } 
   end
 
@@ -36,11 +37,12 @@ defmodule SimpleTank.Game do
   #   { :ok, <Player> }
   #   { :not_found }
   def reconnect_player(_pid, private_id, websocket_pid) do
+    #TODO support multiple games, eliminate @my_pid 
     GenServer.call @my_pid, { :reconnect_player, { private_id, websocket_pid} } 
   end
 
-  def add_bullet(firing_tank) do
-    GenServer.cast @my_pid, { :add_bullet, firing_tank }
+  def add_bullet(game_pid, firing_tank) do
+    GenServer.cast game_pid, { :add_bullet, firing_tank }
   end
   def get_players, do: GenServer.call(@my_pid, :get_players)
 
@@ -60,7 +62,7 @@ defmodule SimpleTank.Game do
   def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do
     #IO.puts("In add player call handler, state is #{inspect(state)}")
     player  = SimpleTank.Player.new(name, websocket_pid)
-    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player)
+    {:ok, tank_pid } =  SimpleTank.Supervisor.add_tank(player, self())
     player  = %SimpleTank.Player{ player | tank_pid: tank_pid} 
 
     { :reply,      
