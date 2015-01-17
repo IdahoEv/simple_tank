@@ -8,7 +8,8 @@ defmodule SimpleTank.Game do
   
   defstruct  players: SimpleTank.PlayerList.new,  # map keyed by id
              last_updated: SimpleTank.Time.now,
-             bullet_list: [] 
+             bullet_list: [],
+             event_manager_pid: nil 
 
   alias SimpleTank.PlayerList
 
@@ -56,7 +57,10 @@ defmodule SimpleTank.Game do
     IO.puts "Game init called with #{inspect(_args)}"
     Process.send_after(self(), :update_world,   @world_update_interval)
     Process.send_after(self(), :update_clients, @client_update_interval)
-    { :ok,  %SimpleTank.Game{} }
+    {:ok, emgr_pid} = GenEvent.start_link()
+    GenEvent.add_handler(emgr_pid, SimpleTank.ScoreboardEventHandler, [])
+    GenEvent.add_handler(emgr_pid, SimpleTank.TankEventHandler, [])
+    { :ok,  %SimpleTank.Game{ event_manager_pid: emgr_pid} }
   end
 
   def handle_call({ :add_player, { name, websocket_pid }}, _from, state) do

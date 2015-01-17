@@ -15,7 +15,11 @@ defmodule SimpleTank.GameUpdate do
     bullet_geometry_list = get_bullet_geometries(bullet_list) 
     tank_geometry_list = get_tank_geometries(tank_map)
 
-    impacted_bullets = do_bullet_collisions(bullet_geometry_list, tank_geometry_list)
+    impacted_bullets = do_bullet_collisions(
+      old_state.event_manager_pid, 
+      bullet_geometry_list, 
+      tank_geometry_list
+    )
 
     %Game{ old_state | bullet_list: (bullet_list -- impacted_bullets)}
   end
@@ -40,14 +44,19 @@ defmodule SimpleTank.GameUpdate do
     end)
   end
 
-  def do_bullet_collisions(bullet_geometry_list, tank_geometry_list) do
+  def do_bullet_collisions( event_mgr_pid, 
+                            bullet_geometry_list, 
+                            tank_geometry_list) do
     collisions = Collider.ListCollider.find_hits(bullet_geometry_list, tank_geometry_list)
     Enum.filter_map(collisions, 
       fn({bullet, player, _}) -> 
         bullet.player_id != player.id
       end,
       fn({bullet, player, _}) -> 
-        IO.puts "Hit on #{player.name}!"            
+        IO.puts "Hit on #{player.name}!"
+        GenEvent.notify(event_mgr_pid, 
+          {:tank_hit, bullet.player_id, player.id, player.tank_pid}
+        )        
         bullet
       end
     )    

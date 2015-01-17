@@ -1,4 +1,3 @@
-
 defmodule TankPhysicsFacts do
   @delta 0.5 
 

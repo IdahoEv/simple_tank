@@ -9,7 +9,8 @@ defmodule SimpleTank.Supervisor do
 
   def init(_) do
     children = [
-      worker(SimpleTank.Game, [])
+      worker(SimpleTank.Game,       []),
+      worker(SimpleTank.Scoreboard, [[name: SimpleTank.Scoreboard]]),
     ]
     supervise(children, strategy: :one_for_one)
   end
