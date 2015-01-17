@@ -2,6 +2,7 @@ var GameWindow = (function () {
 
   var my = {},
     game,
+    sfx,
     key_handler,
     tank_state = {},
     bullet_sprites = {},
@@ -28,6 +29,7 @@ var GameWindow = (function () {
   function preload() {
     game.load.image('tank', '/static/images/tank-32.png');
     game.load.image('shell', '/static/images/shell-32.png');
+    game.load.audio('sfx', '/static/audio/SoundTrack.ogg');
     game.stage.disableVisibilityChange = true;
   }
  
@@ -47,6 +49,17 @@ var GameWindow = (function () {
       key.onDown.add(keys[i][1]);
       key.onUp.add(keys[i][2]);
     }
+
+    //	Here we set-up our audio sprite
+    sfx = game.add.audio('sfx');
+    sfx.allowMultiple = true;
+
+    //	And this defines the markers.
+
+    //	They consist of a key (for replaying), the time the sound starts and the duration, both given in seconds.
+    //	You can also set the volume and loop state, although we don't use them in this example (see the docs)
+    sfx.addMarker('fire-self', 0, 1.5);
+    sfx.addMarker('hit-self',  2, 0.5);
   }
 
 
@@ -194,13 +207,14 @@ var GameWindow = (function () {
       }   
     }   
   }
-
-
-  
   
   my.update_bullet_list = function(new_bullet_list) {
     bullet_list = new_bullet_list;
     updateBullets();
+  }
+
+  my.playShotSound = function() {
+    sfx.play("fire-self");
   }
   
   return my;

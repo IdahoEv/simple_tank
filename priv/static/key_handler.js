@@ -1,9 +1,9 @@
 var KeyHandler = (function(){
   var my = {},
     control_state,
-    timeout_loop; 
+    timeout_loop;
 
-  my.init = function(){
+  my.init = function(sound_effects){
     control_state = { acceleration: 'off', rotation: 'off', trigger: 'off' };
   }
 
@@ -22,6 +22,9 @@ var KeyHandler = (function(){
     //console.log('updateState called');
     if (control_state[control] != state) {
       control_state[control] = state;
+      if (control == 'trigger' && state == 'on'){
+        GameWindow.playShotSound();
+      }
       transmit();
     }
     if (control == "rotation") { GameWindow.update_UI_steering(state) }    
