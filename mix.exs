@@ -32,11 +32,11 @@ defmodule SimpleTank.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [ { :cowboy, "~> 1.0.0"  },
-      { :jsex, "~> 2.0.0" },
+      { :poison, "~> 2.0"},
       { :uuid, "~> 0.1.5" },
       { :amrita, "~> 0.4", github: "josephwilk/amrita" },
       { :apex, "~> 0.3.2 "},
-      { :coverex, "~> 1.0.0", only: :test }
+      # { :coverex, "~> 1.0.0", only: :test }
 
       #{ :dbg, "~> 0.14.3" }
     ]

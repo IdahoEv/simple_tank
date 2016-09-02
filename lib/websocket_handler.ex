@@ -14,9 +14,11 @@ defmodule WebsocketHandler do
   end
 
   def websocket_handle({:text, msg}, req, state) do
-    IO.puts("handle A")
-    {:ok, json} = JSEX.decode(msg)
-    handle_message(json, req, state)
+    IO.puts("Incoming message:")
+    IO.inspect msg
+    data = Poison.Parser.parse!(msg, as: %{})
+    IO.inspect data
+    handle_message(data, req, state)
   end
 
   def websocket_handle(_data, req, state) do

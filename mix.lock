@@ -11,6 +11,6 @@
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
   "meck": {:git, "https://github.com/eproxus/meck.git", "c772db17a7c94e75d20688197f61538d63fe2ae9", [branch: "master"]},
-  "poison": {:hex, :poison, "1.1.1", "bd0e0a119335889baa93cd06fb9901a33ff384ccf783f52387207ac2b7a19438", [:mix], []},
+  "poison": {:hex, :poison, "2.2.0", "4763b69a8a77bd77d26f477d196428b741261a761257ff1cf92753a0d4d24a63", [:mix], []},
   "ranch": {:hex, :ranch, "1.2.1", "a6fb992c10f2187b46ffd17ce398ddf8a54f691b81768f9ef5f461ea7e28c762", [:make], []},
   "uuid": {:hex, :uuid, "0.1.5", "b6ace36a422cb8a1c3b02901aa5627595f115fe185ac8b0fdd0a8ee48c235068", [:mix], []}}

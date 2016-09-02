@@ -1,9 +1,9 @@
 defmodule SimpleTank.PlayerConnection do
-  
+
   alias SimpleTank.Player
 
   # connect:  connect a new player.  Must return a tuple of the form
-  # { { :text, message }, %Player{} } 
+  # { { :text, message }, %Player{} }
   # Where the first part will be the reply section of a websocket message sent
   # back to the player, and the latter part will be the  Player struct that will
   # form the new state for the WebsocketHandler.
@@ -18,22 +18,22 @@ defmodule SimpleTank.PlayerConnection do
   # Player calls 'new' or 'reconnect' but already has associated tank, the state contained a player
   def connect(_, _player_name, %Player{} = player) do
     case { :erlang.is_process_alive(player.tank_pid),  self() == player.websocket_pid() } do
-      { true, true } ->  
+      { true, true } ->
         IO.puts "Player is already connected, refusing new connection"
         SimpleTank.Debug.print_player_registry(self())
         player_reply_with_state(player)
       { _, _ } ->
-        { :error, "Player submitted to connect() but tank or websocket didn't match."}          
+        { :error, "Player submitted to connect() but tank or websocket didn't match."}
     end
   end
 
   # Player attempts reconnect via private_id
   def connect(private_id, player_name, nil) do
     player = case  SimpleTank.Game.reconnect_player(:game, private_id, self()) do
-      { :ok, player } -> 
+      { :ok, player } ->
         player
-      { :not_found }  -> 
-        { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self() )      
+      { :not_found }  ->
+        { :ok, player } = SimpleTank.Game.add_player(:game, player_name, self() )
         player
     end
     SimpleTank.Debug.print_player_registry(self())
@@ -45,8 +45,10 @@ defmodule SimpleTank.PlayerConnection do
   end
 
   def player_reply_with_state(player) do
-    { :ok, reply } = JSEX.encode(%{ private_id: player.private_id, id: player.id })
+    IO.inspect player.private_id
+    IO.inspect player.id
+    reply = Poison.encode!(%{ private_id: player.private_id, id: player.id })
     { { :text, reply }, player }
   end
-  
+
 end
