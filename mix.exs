@@ -4,17 +4,17 @@ defmodule SimpleTank.Mixfile do
   def project do
     [app: :simple_tank,
      version: "0.0.1",
-     elixir: "~> 1.0.0",
+     elixir: ">= 1.0.0",
      deps: deps,
      test_coverage: [tool: Coverex.Task]
-   ] 
+   ]
   end
 
   # Configuration for the OTP application
   #
   # Type `mix help compile.app` for more information
   def application do
-    [ 
+    [
       mod: { SimpleTank, []},
       applications: [ :cowboy, :ranch, #:dbg
       ]
@@ -32,7 +32,7 @@ defmodule SimpleTank.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [ { :cowboy, "~> 1.0.0"  },
-      { :jsex, "~> 2.0.0" }, 
+      { :jsex, "~> 2.0.0" },
       { :uuid, "~> 0.1.5" },
       { :amrita, "~> 0.4", github: "josephwilk/amrita" },
       { :apex, "~> 0.3.2 "},

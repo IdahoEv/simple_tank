@@ -14,15 +14,16 @@ defmodule WebsocketHandler do
   end
 
   def websocket_handle({:text, msg}, req, state) do
+    IO.puts("handle A")
     {:ok, json} = JSEX.decode(msg)
     handle_message(json, req, state)
   end
 
-  def websocket_handle(_data, req, state) do    
+  def websocket_handle(_data, req, state) do
     IO.puts "Warning, unhandled message received over socket"
     {:ok, req, state}
   end
- 
+
   # connect requests should come with either "new" or a private_id.
   def handle_message(%{ "connect" => command, "name" => player_name }, req, state) do
     case SimpleTank.PlayerConnection.connect(command, player_name, state) do
@@ -33,14 +34,14 @@ defmodule WebsocketHandler do
 
   def handle_message(%{ "controls" => control_map }, req, %Player{} = player) do
     #IO.puts "Updating #{inspect(player.tank_pid)} with controls #{inspect(control_map)} "
-    SimpleTank.Tank.update_controls(player.tank_pid, control_map) 
+    SimpleTank.Tank.update_controls(player.tank_pid, control_map)
     { :ok, req, player }
   end
   # Refuse control messages if there's no player for this websocket.  Shut down
   # instead, forcing the user to reconnect.
-  def handle_message(%{ "controls" => _control_map }, req, _state) do
-    IO.puts "Shutting down websocket - controls came in with state #{inspect(_state)}"
-    { :shutdown, req, _state }
+  def handle_message(%{ "controls" => _control_map }, req, state) do
+    IO.puts "Shutting down websocket - controls came in with state #{inspect(state)}"
+    { :shutdown, req, state }
   end
 
   def handle_message(message, req, state) do
@@ -50,11 +51,11 @@ defmodule WebsocketHandler do
 
   # Refuse update messages if there's no player for this websocket.  Shut down
   # instead, forcing a reconnect.
-  def websocket_info({ :update, _msg }, req, nil ) do 
+  def websocket_info({ :update, _msg }, req, nil ) do
     { :shutdown, req, nil}
   end
   # Send an update of the world state out to the client
-  def websocket_info({ :update, msg }, req, state) do 
+  def websocket_info({ :update, msg }, req, state) do
     {:reply, {:text, msg}, req, state}
   end
 
@@ -62,7 +63,7 @@ defmodule WebsocketHandler do
     IO.puts "Unhandled erlang message in socket handler:  #{inspect(message)}"
     {:ok, req, state}
   end
-  
+
   def websocket_terminate(_reason, _req, _state) do
     :ok
   end
